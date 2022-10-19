@@ -29,16 +29,19 @@ val sjsDomVersion = "2.3.0"
 val munitCEVersion = "2.0.0-M3"
 val scalaCheckEffectVersion = "2.0.0-M2"
 
-lazy val root = project.in(file(".")).aggregate(rootNodeJS, rootChrome, rootFirefox)
+lazy val root = project
+  .in(file("."))
+  .aggregate(rootNodeJS, rootChrome, rootFirefox)
+  .enablePlugins(NoPublishPlugin)
 
 lazy val rootNodeJS =
-  project.in(file(".rootNodeJS")).aggregate(dom, testsNodeJS)
+  project.in(file(".rootNodeJS")).aggregate(dom, testsNodeJS).enablePlugins(NoPublishPlugin)
 
 lazy val rootChrome =
-  project.in(file(".rootChrome")).aggregate(dom, testsChrome)
+  project.in(file(".rootChrome")).aggregate(dom, testsChrome).enablePlugins(NoPublishPlugin)
 
 lazy val rootFirefox =
-  project.in(file(".rootFirefox")).aggregate(dom, testsFirefox)
+  project.in(file(".rootFirefox")).aggregate(dom, testsFirefox).enablePlugins(NoPublishPlugin)
 
 lazy val dom = project
   .in(file("dom"))
