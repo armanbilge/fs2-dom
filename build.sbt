@@ -31,6 +31,7 @@ lazy val rootFirefox =
 
 lazy val dom = project
   .in(file("dom"))
+  .enablePlugins(ScalaJSPlugin)
   .settings(
     name := "fs2-dom",
     libraryDependencies ++= Seq(
