@@ -36,7 +36,7 @@ lazy val dom = project
     name := "fs2-dom",
     libraryDependencies ++= Seq(
       "co.fs2" %%% "fs2-core" % fs2Version,
-      "org.scala-js" %%% "scala-js-dom" % sjsDomVersion
+      "org.scala-js" %%% "scalajs-dom" % sjsDomVersion
     )
   )
 
@@ -53,7 +53,7 @@ def configureTest(project: Project): Project =
     .enablePlugins(ScalaJSPlugin, NoPublishPlugin)
     .settings(
       libraryDependencies ++= Seq(
-        "org.scalameta" %%% "munit-cats-effect" % munitCEVersion
+        "org.typelevel" %%% "munit-cats-effect" % munitCEVersion
       ),
       Compile / unmanagedSourceDirectories +=
         (LocalRootProject / baseDirectory).value / "tests" / "src" / "main" / "scala",
