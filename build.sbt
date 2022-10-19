@@ -15,6 +15,7 @@ ThisBuild / githubWorkflowBuildMatrixAdditions +=
   "project" -> List("rootNodeJS", "rootChrome", "rootFirefox")
 ThisBuild / githubWorkflowBuildSbtStepPreamble += s"project $${{ matrix.project }}"
 
+val ceVersion = "3.4.0-RC2"
 val fs2Version = "3.3.0"
 val sjsDomVersion = "2.3.0"
 val munitCEVersion = "2.0.0-M3"
@@ -36,6 +37,7 @@ lazy val dom = project
   .settings(
     name := "fs2-dom",
     libraryDependencies ++= Seq(
+      "org.typelevel" %%% "cats-effect" % ceVersion,
       "co.fs2" %%% "fs2-core" % fs2Version,
       "org.scala-js" %%% "scalajs-dom" % sjsDomVersion
     )

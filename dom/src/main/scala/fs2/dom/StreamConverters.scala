@@ -19,8 +19,12 @@ package dom
 
 import cats.effect.kernel.Async
 import cats.effect.kernel.Resource
+import cats.effect.std.Dispatcher
+import cats.effect.std.Queue
 import cats.syntax.all._
 import org.scalajs.dom.ReadableStream
+import org.scalajs.dom.ReadableStreamType
+import org.scalajs.dom.ReadableStreamUnderlyingSource
 
 import scala.scalajs.js
 import scala.scalajs.js.typedarray.Uint8Array
@@ -70,5 +74,31 @@ private[dom] object StreamConverters {
       else js.Promise.resolve[Unit](())
     }
   }
+
+  def toReadableStream[F[_]](implicit F: Async[F]): Pipe[F, Byte, ReadableStream[Uint8Array]] =
+    (in: Stream[F, Byte]) =>
+      Stream.resource(Dispatcher.sequential).flatMap { dispatcher =>
+        Stream
+          .eval(Queue.synchronous[F, Option[Chunk[Byte]]])
+          .flatMap { chunks =>
+            Stream
+              .eval(F.delay {
+                val source = new ReadableStreamUnderlyingSource[Uint8Array] {
+                  `type` = ReadableStreamType.bytes
+                  pull = js.defined { controller =>
+                    dispatcher.unsafeToPromise {
+                      chunks.take.flatMap {
+                        case Some(chunk) =>
+                          F.delay(controller.enqueue(chunk.toUint8Array))
+                        case None => F.delay(controller.close())
+                      }
+                    }
+                  }
+                }
+                ReadableStream[Uint8Array](source)
+              })
+              .concurrently(in.enqueueNoneTerminatedChunks(chunks))
+          }
+      }
 
 }
