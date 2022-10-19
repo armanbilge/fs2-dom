@@ -20,6 +20,7 @@
           typelevelShell = {
             jdk.package = pkgs.jdk17;
             nodejs.enable = true;
+            nodejs.package = pkgs.nodejs;
           };
           packages = [ pkgs.chromium pkgs.chromedriver pkgs.firefox pkgs.geckodriver ];
         };
