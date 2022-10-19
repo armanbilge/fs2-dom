@@ -15,10 +15,19 @@ ThisBuild / githubWorkflowBuildMatrixAdditions +=
   "project" -> List("rootNodeJS", "rootChrome", "rootFirefox")
 ThisBuild / githubWorkflowBuildSbtStepPreamble += s"project $${{ matrix.project }}"
 
+ThisBuild / githubWorkflowBuildPreamble +=
+  WorkflowStep.Use(
+    UseRef.Public("actions", "setup-node", "v3"),
+    name = Some("Setup Node.js"),
+    params = Map("node-version" -> "18"),
+    cond = Some("matrix.project == 'rootNodeJS'")
+  )
+
 val ceVersion = "3.4.0-RC2"
 val fs2Version = "3.3.0"
 val sjsDomVersion = "2.3.0"
 val munitCEVersion = "2.0.0-M3"
+val scalaCheckEffectVersion = "2.0.0-M2"
 
 lazy val root = project.in(file(".")).aggregate(rootNodeJS, rootChrome, rootFirefox)
 
@@ -56,12 +65,14 @@ def configureTest(project: Project): Project =
     .enablePlugins(ScalaJSPlugin, NoPublishPlugin)
     .settings(
       libraryDependencies ++= Seq(
-        "org.typelevel" %%% "munit-cats-effect" % munitCEVersion
+        "org.typelevel" %%% "munit-cats-effect" % munitCEVersion,
+        "org.typelevel" %%% "scalacheck-effect-munit" % scalaCheckEffectVersion
       ),
       Compile / unmanagedSourceDirectories +=
         (LocalRootProject / baseDirectory).value / "tests" / "src" / "main" / "scala",
       Test / unmanagedSourceDirectories +=
-        (LocalRootProject / baseDirectory).value / "tests" / "src" / "test" / "scala"
+        (LocalRootProject / baseDirectory).value / "tests" / "src" / "test" / "scala",
+      testOptions += Tests.Argument("+l")
     )
 
 lazy val testsNodeJS = project
