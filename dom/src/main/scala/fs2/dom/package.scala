@@ -18,11 +18,16 @@ package fs2
 
 import cats.effect.kernel.Async
 import cats.effect.kernel.Resource
+import cats.syntax.all._
+import org.scalajs.dom.Blob
 import org.scalajs.dom.ReadableStream
 
 import scala.scalajs.js.typedarray.Uint8Array
 
 package object dom {
+
+  def readBlob[F[_]](blob: F[Blob])(implicit F: Async[F]): Stream[F, Byte] =
+    readReadableStream(blob.flatMap(b => F.delay(b.stream())))
 
   def readReadableStream[F[_]: Async](
       readableStream: F[ReadableStream[Uint8Array]],
