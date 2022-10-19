@@ -63,7 +63,7 @@ private[dom] object StreamConverters {
         case Resource.ExitCase.Succeeded =>
           rs.cancel(js.undefined)
         case Resource.ExitCase.Errored(ex) =>
-          rs.cancel(ex.getLocalizedMessage())
+          rs.cancel(ex.toString())
         case Resource.ExitCase.Canceled =>
           rs.cancel(js.undefined)
       }
