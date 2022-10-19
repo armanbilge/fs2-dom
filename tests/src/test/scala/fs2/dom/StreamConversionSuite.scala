@@ -24,7 +24,7 @@ import org.scalacheck.effect.PropF.forAllF
 
 class StreamConversionSuite extends CatsEffectSuite with ScalaCheckEffectSuite {
 
-  test("to/read Readable") {
+  test("to/read ReadableStream") {
     forAllF { (chunks: Vector[Vector[Byte]]) =>
       Stream
         .emits(chunks)
