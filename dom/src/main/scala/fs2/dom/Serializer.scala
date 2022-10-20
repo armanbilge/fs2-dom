@@ -54,11 +54,8 @@ object Serializer {
       decoder: Decoder[A],
       encoder: Encoder[A]
   ): Serializer[F, A] = new Serializer[F, A] {
-
     def serialize(a: A): F[js.Any] = F.delay(a.asJsAny)
-
     def deserialize(serialized: js.Any): F[A] = decodeJs[A](serialized).liftTo[F]
-
   }
 
 }
