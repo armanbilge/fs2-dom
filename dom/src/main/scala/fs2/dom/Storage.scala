@@ -17,11 +17,8 @@
 package fs2
 package dom
 
-import cats.effect.kernel.Async
-import cats.effect.kernel.Resource
-import cats.effect.std.Dispatcher
 import cats.syntax.all._
-import fs2.concurrent.Channel
+import cats.effect.kernel.Async
 import fs2.concurrent.Signal
 import org.scalajs.dom
 
@@ -74,29 +71,10 @@ object Storage {
   private[dom] def apply[F[_]](storage: dom.Storage)(implicit F: Async[F]): Storage[F] =
     new Storage[F] {
 
-      def events = {
-        val setup = for {
-          dispatcher <- Dispatcher.sequential[F]
-          abort <- AbortController[F]
-          ch <- Resource.eval {
-            Channel.unbounded[F, dom.StorageEvent].flatTap { ch =>
-              F.delay {
-                dom.window.addEventListener[dom.StorageEvent](
-                  "storage",
-                  ev => dispatcher.unsafeRunAndForget(ch.send(ev)),
-                  new dom.EventListenerOptions {
-                    signal = abort
-                  }
-                )
-              }
-            }
-          }
-        } yield ch
-
-        Stream.resource(setup).flatMap(_.stream).mapFilter { ev =>
+      def events =
+        fs2.dom.events[F, dom.StorageEvent](dom.window, "storage").mapFilter { ev =>
           Option.when(ev.storageArea eq storage)(Event.fromStorageEvent(ev))
         }
-      }
 
       def length = new Signal[F, Int] {
 
