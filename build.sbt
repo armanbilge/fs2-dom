@@ -78,11 +78,19 @@ def configureTest(project: Project): Project =
       testOptions += Tests.Argument("+l")
     )
 
+def configureBrowserTest(project: Project): Project =
+  project.settings(
+    Compile / unmanagedSourceDirectories +=
+      (LocalRootProject / baseDirectory).value / "testsBrowser" / "src" / "main" / "scala",
+    Test / unmanagedSourceDirectories +=
+      (LocalRootProject / baseDirectory).value / "testsBrowser" / "src" / "test" / "scala"
+  )
+
 lazy val testsNodeJS = project
   .configure(configureTest)
 
 lazy val testsChrome = project
-  .configure(configureTest)
+  .configure(configureTest, configureBrowserTest)
   .settings(
     jsEnv := {
       val config = SeleniumJSEnv.Config()
@@ -93,7 +101,7 @@ lazy val testsChrome = project
   )
 
 lazy val testsFirefox = project
-  .configure(configureTest)
+  .configure(configureTest, configureBrowserTest)
   .settings(
     jsEnv := {
       val config = SeleniumJSEnv.Config()
