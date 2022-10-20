@@ -27,7 +27,7 @@ import org.scalajs.dom.PopStateEvent
 import org.scalajs.dom.ScrollRestoration
 import org.scalajs.dom.window
 
-sealed trait History[F[_], S] {
+sealed abstract class History[F[_], S] {
 
   def state: Signal[F, Option[S]]
   def length: Signal[F, Int]
