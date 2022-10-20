@@ -90,7 +90,9 @@ object Storage {
           }
         } yield ch
 
-        Stream.resource(setup).flatMap(_.stream).map(Event.fromStorageEvent(_))
+        Stream.resource(setup).flatMap(_.stream).mapFilter { ev =>
+          Option.when(ev.storageArea eq storage)(Event.fromStorageEvent(ev))
+        }
       }
 
       def length = new Signal[F, Int] {
