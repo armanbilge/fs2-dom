@@ -24,14 +24,14 @@ import munit.CatsEffectSuite
 import org.scalajs.dom.Storage
 import org.scalajs.dom.window
 
-abstract class StorageMapRefSuite extends CatsEffectSuite {
+abstract class StorageSuite extends CatsEffectSuite {
 
   def key = getClass.getName
 
   def storage: Storage
 
   def storageMapRef: Resource[IO, MapRef[IO, String, Option[String]]] =
-    Resource.make(IO(StorageMapRef[IO](storage)))(_ => IO(storage.clear()))
+    Resource.make(IO(Storage[IO](storage)))(_ => IO(storage.clear()))
 
   def ref = storageMapRef.map(_(key))
 
@@ -147,10 +147,10 @@ abstract class StorageMapRefSuite extends CatsEffectSuite {
 
 }
 
-class LocalStorageMapRefSuite extends StorageMapRefSuite {
+class LocalStorageSuite extends StorageSuite {
   def storage = window.localStorage
 }
 
-class SessionStorageMapRefSuite extends StorageMapRefSuite {
+class SessionStorageSuite extends StorageSuite {
   def storage = window.sessionStorage
 }
