@@ -17,11 +17,8 @@
 package fs2
 package dom
 
-import cats.data.State
 import cats.effect.kernel.Async
-import cats.effect.kernel.Ref
 import cats.effect.std.MapRef
-import cats.syntax.all._
 import fs2.concurrent.Signal
 import org.scalajs.dom
 
@@ -85,59 +82,13 @@ object Storage {
 
       def clear = F.delay(storage.clear())
 
-      def apply(key: String) =
-        new Ref[F, Option[String]] {
-
-          def get: F[Option[String]] = F.delay(Option(storage.getItem(key)))
-
-          def set(a: Option[String]): F[Unit] = a.fold(F.delay(storage.removeItem(key))) { data =>
-            F.delay(storage.setItem(key, data))
-          }
-
-          def access: F[(Option[String], Option[String] => F[Boolean])] = F.delay {
-            val snapshot = storage.getItem(key)
-            val setter = (a: Option[String]) =>
-              F.delay {
-                if (storage.getItem(key) eq snapshot) {
-                  a match {
-                    case None        => storage.removeItem(key)
-                    case Some(value) => storage.setItem(key, value)
-                  }
-                  true
-                } else false
-              }
-            (Option(snapshot), setter)
-          }
-
-          def tryUpdate(f: Option[String] => Option[String]): F[Boolean] =
-            update(f).as(true)
-
-          def tryModify[B](f: Option[String] => (Option[String], B)): F[Option[B]] =
-            modify(f).map(Some(_))
-
-          def update(f: Option[String] => Option[String]): F[Unit] =
-            F.delay {
-              f(Option(storage.getItem(key))) match {
-                case None        => storage.removeItem(key)
-                case Some(value) => storage.setItem(key, value)
-              }
-            }
-
-          def modify[B](f: Option[String] => (Option[String], B)): F[B] =
-            F.delay {
-              val (newValue, b) = f(Option(storage.getItem(key)))
-              newValue match {
-                case (None)      => storage.removeItem(key)
-                case Some(value) => storage.setItem(key, value)
-              }
-              b
-            }
-
-          def tryModifyState[B](state: State[Option[String], B]): F[Option[B]] =
-            tryModify(state.run(_).value)
-
-          def modifyState[B](state: State[Option[String], B]): F[B] =
-            modify(state.run(_).value)
+      def apply(key: String) = new WrappedRef[F, Option[String]] {
+        def unsafeGet(): Option[String] = Option(storage.getItem(key))
+        def unsafeSet(a: Option[String]): Unit = a match {
+          case None        => storage.removeItem(key)
+          case Some(value) => storage.setItem(key, value)
         }
+      }
+
     }
 }
