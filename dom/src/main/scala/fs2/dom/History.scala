@@ -16,6 +16,7 @@
 
 package fs2.dom
 
+import cats.data.OptionT
 import cats.effect.kernel.Async
 import cats.effect.kernel.Ref
 import cats.syntax.all._
@@ -28,7 +29,7 @@ import org.scalajs.dom.window
 
 sealed trait History[F[_], S] {
 
-  def state: Signal[F, S]
+  def state: Signal[F, Option[S]]
   def length: Signal[F, Int]
   def scrollRestoration: Ref[F, ScrollRestoration]
 
@@ -49,13 +50,16 @@ object History {
   def apply[F[_], S](implicit F: Async[F], serializer: Serializer[F, S]): History[F, S] =
     new History[F, S] {
 
-      def state = new Signal[F, S] {
+      def state = new Signal[F, Option[S]] {
         def discrete =
-          Stream.eval(get) ++ events[F, PopStateEvent](window, "popstate").evalMap(e =>
-            serializer.deserialize(e.state)
-          )
+          Stream.eval(get) ++ events[F, PopStateEvent](window, "popstate")
+            .evalMap(e => serializer.deserialize(e.state))
+            .map(Some(_))
 
-        def get = F.delay(window.history.state).flatMap(serializer.deserialize(_))
+        def get = OptionT(F.delay(Option(window.history.state)))
+          .semiflatMap(serializer.deserialize(_))
+          .value
+
         def continuous = Stream.repeatEval(get)
       }
 
