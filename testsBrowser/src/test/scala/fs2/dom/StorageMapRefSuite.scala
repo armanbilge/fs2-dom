@@ -21,14 +21,13 @@ import cats.effect.IO
 import cats.effect.kernel.Resource
 import cats.effect.std.MapRef
 import munit.CatsEffectSuite
-import org.scalajs.dom.Storage
-import org.scalajs.dom.window
+import org.scalajs.dom
 
 abstract class StorageSuite extends CatsEffectSuite {
 
   def key = getClass.getName
 
-  def storage: Storage
+  def storage: dom.Storage
 
   def storageMapRef: Resource[IO, MapRef[IO, String, Option[String]]] =
     Resource.make(IO(Storage[IO](storage)))(_ => IO(storage.clear()))
@@ -148,9 +147,9 @@ abstract class StorageSuite extends CatsEffectSuite {
 }
 
 class LocalStorageSuite extends StorageSuite {
-  def storage = window.localStorage
+  def storage = dom.window.localStorage
 }
 
 class SessionStorageSuite extends StorageSuite {
-  def storage = window.sessionStorage
+  def storage = dom.window.sessionStorage
 }
