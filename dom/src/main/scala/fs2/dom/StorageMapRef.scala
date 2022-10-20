@@ -24,7 +24,7 @@ import cats.effect.std.MapRef
 import cats.syntax.all._
 import org.scalajs.dom.Storage
 
-object StorageMapRef {
+private[dom] object StorageMapRef {
 
   def apply[F[_]](storage: Storage)(implicit F: Sync[F]): MapRef[F, String, Option[String]] =
     key =>

@@ -21,8 +21,10 @@ import cats.effect.kernel.Resource
 import cats.syntax.all._
 import org.scalajs.dom.Blob
 import org.scalajs.dom.ReadableStream
+import org.scalajs.dom.window
 
 import scala.scalajs.js.typedarray.Uint8Array
+import cats.effect.kernel.Sync
 
 package object dom {
 
@@ -41,5 +43,11 @@ package object dom {
       stream: Stream[F, Byte]
   ): Resource[F, ReadableStream[Uint8Array]] =
     stream.through(toReadableStream).compile.resource.lastOrError
+
+  def localStorageMapRef[F[_]: Sync, String, Option[String]] =
+    StorageMapRef(window.localStorage)
+
+  def sessionStorageMapRef[F[_]: Sync, String, Option[String]] =
+    StorageMapRef(window.sessionStorage)
 
 }
