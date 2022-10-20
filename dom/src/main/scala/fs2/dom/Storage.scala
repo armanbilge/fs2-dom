@@ -17,16 +17,22 @@
 package fs2
 package dom
 
+import cats.syntax.all._
 import cats.effect.kernel.Async
-import cats.effect.std.MapRef
 import fs2.concurrent.Signal
 import org.scalajs.dom
 
-sealed trait Storage[F[_]] extends MapRef[F, String, Option[String]] {
+sealed abstract class Storage[F[_]] {
 
   def events: Stream[F, Storage.Event]
 
   def length: Signal[F, Int]
+
+  def getItem(key: String): F[Option[String]]
+
+  def setItem(key: String, item: String): F[Unit]
+
+  def removeItem(key: String): F[Unit]
 
   def key(i: Int): F[Option[String]]
 
@@ -66,7 +72,9 @@ object Storage {
     new Storage[F] {
 
       def events =
-        fs2.dom.events[F, dom.StorageEvent](dom.window, "storage").map(Event.fromStorageEvent(_))
+        fs2.dom.events[F, dom.StorageEvent](dom.window, "storage").mapFilter { ev =>
+          Option.when(ev.storageArea eq storage)(Event.fromStorageEvent(ev))
+        }
 
       def length = new Signal[F, Int] {
 
@@ -78,17 +86,18 @@ object Storage {
 
       }
 
+      def getItem(key: String) =
+        F.delay(Option(storage.getItem(key)))
+
+      def setItem(key: String, item: String) =
+        F.delay(storage.setItem(key, item))
+
+      def removeItem(key: String) =
+        F.delay(storage.removeItem(key))
+
       def key(i: Int) = F.delay(Option(storage.key(i)))
 
       def clear = F.delay(storage.clear())
-
-      def apply(key: String) = new WrappedRef[F, Option[String]] {
-        def unsafeGet(): Option[String] = Option(storage.getItem(key))
-        def unsafeSet(a: Option[String]): Unit = a match {
-          case None        => storage.removeItem(key)
-          case Some(value) => storage.setItem(key, value)
-        }
-      }
 
     }
 }
