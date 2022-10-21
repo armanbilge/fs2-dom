@@ -18,11 +18,11 @@ package fs2.dom
 
 import cats.effect.IO
 import fs2.concurrent.Channel
-import munit.CatsEffectSuite
+import weaver.SimpleIOSuite
 
 import scala.concurrent.duration._
 
-class HistorySuite extends CatsEffectSuite {
+object HistorySuite extends SimpleIOSuite {
 
   test("history") {
     val history = History[IO, Int]
@@ -30,19 +30,19 @@ class HistorySuite extends CatsEffectSuite {
       history.state.discrete.unNone.through(ch.sendAll).compile.drain.background.surround {
         for {
           _ <- IO.sleep(1.second) // so popstate listener can register
-          _ <- history.state.get.assertEquals(None)
+          _ <- history.state.get.flatMap(expect.eql(_, None).failFast)
           _ <- history.pushState(1)
-          _ <- history.state.get.assertEquals(Some(1))
+          _ <- history.state.get.flatMap(expect.eql(_, Some(1)).failFast)
           _ <- history.pushState(2)
-          _ <- history.state.get.assertEquals(Some(2))
+          _ <- history.state.get.flatMap(expect.eql(_, Some(2)).failFast)
           _ <- history.replaceState(3)
-          _ <- history.state.get.assertEquals(Some(3))
+          _ <- history.state.get.flatMap(expect.eql(_, Some(3)).failFast)
           _ <- history.back
-          _ <- history.state.get.assertEquals(Some(1))
+          _ <- history.state.get.flatMap(expect.eql(_, Some(1)).failFast)
           _ <- history.forward
-          _ <- history.state.get.assertEquals(Some(3))
-          _ <- ch.stream.take(2).compile.toList.flatTap(IO.println).assertEquals(List(1, 3))
-        } yield ()
+          _ <- history.state.get.flatMap(expect.eql(_, Some(3)).failFast)
+          events <- ch.stream.take(2).compile.toList
+        } yield expect.eql(events, List(1, 3))
       }
     }
   }

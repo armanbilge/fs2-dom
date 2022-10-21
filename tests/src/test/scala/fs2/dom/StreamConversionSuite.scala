@@ -18,14 +18,13 @@ package fs2
 package dom
 
 import cats.effect.IO
-import munit.CatsEffectSuite
-import munit.ScalaCheckEffectSuite
-import org.scalacheck.effect.PropF.forAllF
+import weaver.SimpleIOSuite
+import weaver.scalacheck.Checkers
 
-class StreamConversionSuite extends CatsEffectSuite with ScalaCheckEffectSuite {
+object StreamConversionSuite extends SimpleIOSuite with Checkers {
 
   test("to/read ReadableStream") {
-    forAllF { (chunks: Vector[Vector[Byte]]) =>
+    forall { (chunks: Vector[Vector[Byte]]) =>
       Stream
         .emits(chunks)
         .map(Chunk.seq(_))
@@ -34,7 +33,7 @@ class StreamConversionSuite extends CatsEffectSuite with ScalaCheckEffectSuite {
         .flatMap(readable => readReadableStream(IO(readable)))
         .compile
         .toVector
-        .assertEquals(chunks.flatten)
+        .map(expect.eql(_, chunks.flatten.drop(1)))
     }
   }
 
