@@ -19,7 +19,7 @@ package fs2.dom
 import cats.effect.kernel.Async
 import org.scalajs.dom.window
 
-sealed abstract class Clipboard[F[_]] {
+abstract class Clipboard[F[_]] private {
 
   def readText: F[String]
 

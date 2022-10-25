@@ -22,7 +22,7 @@ import cats.effect.kernel.Async
 import fs2.concurrent.Signal
 import org.scalajs.dom
 
-sealed abstract class Storage[F[_]] {
+abstract class Storage[F[_]] private {
 
   def events: Stream[F, Storage.Event]
 
