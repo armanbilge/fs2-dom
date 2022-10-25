@@ -93,7 +93,7 @@ object History {
       def asyncPopState(thunk: => Unit): F[Unit] = F.async_[Unit] { cb =>
         window.addEventListener[PopStateEvent](
           "popstate",
-          _ => cb(Either.unit),
+          (_: Any) => cb(Either.unit),
           new EventListenerOptions {
             once = true
           }

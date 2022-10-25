@@ -73,7 +73,10 @@ object Storage {
 
       def events =
         fs2.dom.events[F, dom.StorageEvent](dom.window, "storage").mapFilter { ev =>
-          Option.when(ev.storageArea eq storage)(Event.fromStorageEvent(ev))
+          if (ev.storageArea eq storage)
+            Some(Event.fromStorageEvent(ev))
+          else
+            None
         }
 
       def length = new Signal[F, Int] {

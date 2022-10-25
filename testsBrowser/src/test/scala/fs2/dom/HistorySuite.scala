@@ -41,7 +41,7 @@ class HistorySuite extends CatsEffectSuite {
           _ <- history.state.get.assertEquals(Some(1))
           _ <- history.forward
           _ <- history.state.get.assertEquals(Some(3))
-          _ <- ch.stream.take(2).compile.toList.flatTap(IO.println).assertEquals(List(1, 3))
+          _ <- ch.stream.take(2).compile.toList.assertEquals(List(1, 3))
         } yield ()
       }
     }
