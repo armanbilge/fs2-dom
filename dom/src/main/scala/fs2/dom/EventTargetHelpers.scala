@@ -39,7 +39,7 @@ private[dom] object EventTargetHelpers {
           F.delay {
             target.addEventListener[E](
               `type`,
-              ev => dispatcher.unsafeRunAndForget(ch.send(ev)),
+              (ev: E) => dispatcher.unsafeRunAndForget(ch.send(ev)),
               new EventListenerOptions {
                 signal = abort
               }
