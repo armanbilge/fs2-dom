@@ -1,7 +1,9 @@
 # fs2-dom
 
-Idiomatic Cats Effect and FS2 integrations for [Web APIs] via [scala-js-dom].
+Idiomatic [Cats Effect] and [FS2] integrations for [Web APIs] via [scala-js-dom].
 
+[Cats Effect]: https://typelevel.org/cats-effect/
+[FS2]: https://fs2.io/
 [Web APIs]: https://developer.mozilla.org/en-US/docs/Web/API
 [scala-js-dom]: https://github.com/scala-js/scala-js-dom
 
