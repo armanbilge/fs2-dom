@@ -19,12 +19,27 @@ package fs2.dom
 import cats.effect.IO
 import munit.CatsEffectSuite
 
+import scala.concurrent.duration._
+
 class LockManagerSuite extends CatsEffectSuite {
 
   test("no contention") {
     IO.ref(false).flatMap { ref =>
       LockManager[IO].exclusive("lock").surround(ref.set(true)) *> ref.get.assert
     }
+  }
+
+  test("use cancelable") {
+    val cancel = LockManager[IO].exclusive("lock").surround(IO.never).timeoutTo(1.second, IO.unit)
+    val reacquire = IO.ref(false).flatMap { ref =>
+      LockManager[IO].exclusive("lock").surround(ref.set(true)) *> ref.get.assert
+    }
+
+    cancel *> reacquire
+  }
+
+  test("tryExclusive") {
+    LockManager[IO].tryExclusive("lock").use(IO.pure).assert
   }
 
 }

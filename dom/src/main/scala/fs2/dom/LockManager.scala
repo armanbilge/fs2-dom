@@ -25,6 +25,7 @@ import fs2.dom.facade.LockRequestOptions
 import org.scalajs.dom.window
 
 import scala.scalajs.js
+import org.scalajs.dom.AbortSignal
 
 abstract class LockManager[F[_]] private {
 
@@ -57,18 +58,22 @@ object LockManager {
       def request(name: String, _mode: String, _ifAvailable: Boolean) =
         for {
           dispatcher <- Dispatcher.sequential
-          abort <- AbortController[F]
+          abort <-
+            if (_ifAvailable) Resource.pure[F, Option[AbortSignal]](None)
+            else AbortController[F].map(_.some)
           gate <- Resource.eval(F.deferred[facade.Lock])
           request <- F.background {
             F.fromPromise {
               F.delay {
+                val options = new LockRequestOptions {
+                  mode = _mode
+                  ifAvailable = _ifAvailable
+                }
+                abort.foreach(options.signal = _)
+
                 manager.request(
                   name,
-                  new LockRequestOptions {
-                    mode = _mode
-                    ifAvailable = _ifAvailable
-                    signal = abort
-                  },
+                  options,
                   lock => dispatcher.unsafeToPromise(gate.complete(lock).void)
                 )
               }
