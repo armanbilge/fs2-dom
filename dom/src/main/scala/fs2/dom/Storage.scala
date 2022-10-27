@@ -19,14 +19,13 @@ package dom
 
 import cats.syntax.all._
 import cats.effect.kernel.Async
-import fs2.concurrent.Signal
 import org.scalajs.dom
 
 abstract class Storage[F[_]] private {
 
   def events: Stream[F, Storage.Event]
 
-  def length: Signal[F, Int]
+  def length: F[Int]
 
   def getItem(key: String): F[Option[String]]
 
@@ -79,15 +78,7 @@ object Storage {
             None
         }
 
-      def length = new Signal[F, Int] {
-
-        def get = F.delay(storage.length)
-
-        def discrete = Stream.eval(get) ++ events.evalMap(_ => get)
-
-        def continuous = Stream.repeatEval(get)
-
-      }
+      def length = F.delay(storage.length)
 
       def getItem(key: String) =
         F.delay(Option(storage.getItem(key)))
