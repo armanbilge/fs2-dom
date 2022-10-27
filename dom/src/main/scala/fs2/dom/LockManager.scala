@@ -20,12 +20,13 @@ import cats.effect.kernel.Async
 import cats.effect.kernel.Poll
 import cats.effect.kernel.Resource
 import cats.effect.std.Dispatcher
+import cats.effect.syntax.all._
 import cats.syntax.all._
 import fs2.dom.facade.LockRequestOptions
+import org.scalajs.dom
 import org.scalajs.dom.window
 
 import scala.scalajs.js
-import org.scalajs.dom.AbortSignal
 
 abstract class LockManager[F[_]] private {
 
@@ -58,10 +59,15 @@ object LockManager {
       def request(name: String, _mode: String, _ifAvailable: Boolean) =
         for {
           dispatcher <- Dispatcher.sequential
+
           abort <-
-            if (_ifAvailable) Resource.pure[F, Option[AbortSignal]](None)
-            else AbortController[F].map(_.some)
+            if (_ifAvailable)
+              Resource.pure[F, Option[dom.AbortController]](None)
+            else
+              Resource.eval(F.delay(Some(new dom.AbortController)))
+
           gate <- Resource.eval(F.deferred[facade.Lock])
+
           request <- F.background {
             F.fromPromise {
               F.delay {
@@ -69,7 +75,7 @@ object LockManager {
                   mode = _mode
                   ifAvailable = _ifAvailable
                 }
-                abort.foreach(options.signal = _)
+                abort.foreach(ctrl => options.signal = ctrl.signal)
 
                 manager.request(
                   name,
@@ -79,9 +85,11 @@ object LockManager {
               }
             }
           }
-          lock <- Resource.makeFull((poll: Poll[F]) => poll(gate.get))(_ =>
-            request.flatMap(_.embedNever)
-          )
+
+          lock <- Resource.makeFull { (poll: Poll[F]) =>
+            poll(gate.get).onCancel(abort.foldMapA(ctrl => F.delay(ctrl.abort())))
+          }(_ => request.flatMap(_.embedNever))
+
         } yield Option(lock)
     }
 
