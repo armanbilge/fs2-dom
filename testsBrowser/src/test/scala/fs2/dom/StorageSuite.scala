@@ -17,8 +17,8 @@
 package fs2.dom
 
 import cats.effect.IO
-import munit.CatsEffectSuite
 import cats.effect.std.Random
+import munit.CatsEffectSuite
 
 abstract class StorageSuite(storage: Storage[IO]) extends CatsEffectSuite {
 
