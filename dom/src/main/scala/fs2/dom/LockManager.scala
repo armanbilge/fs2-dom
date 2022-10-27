@@ -66,7 +66,8 @@ object LockManager {
             else
               Resource.eval(F.delay(Some(new dom.AbortController)))
 
-          gate <- Resource.eval(F.deferred[facade.Lock])
+          startGate <- Resource.eval(F.deferred[facade.Lock])
+          endGate <- Resource.eval(F.deferred[Unit])
 
           request <- F.background {
             F.fromPromise {
@@ -80,15 +81,15 @@ object LockManager {
                 manager.request(
                   name,
                   options,
-                  lock => dispatcher.unsafeToPromise(gate.complete(lock).void)
+                  lock => dispatcher.unsafeToPromise(startGate.complete(lock) *> endGate.get)
                 )
               }
             }
           }
 
           lock <- Resource.makeFull { (poll: Poll[F]) =>
-            poll(gate.get).onCancel(abort.foldMapA(ctrl => F.delay(ctrl.abort())))
-          }(_ => request.flatMap(_.embedNever))
+            poll(startGate.get).onCancel(abort.foldMapA(ctrl => F.delay(ctrl.abort())))
+          }(_ => endGate.complete(()) *> request.flatMap(_.embedNever))
 
         } yield Option(lock)
     }

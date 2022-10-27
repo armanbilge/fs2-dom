@@ -38,8 +38,13 @@ class LockManagerSuite extends CatsEffectSuite {
     cancel *> reacquire
   }
 
-  test("tryExclusive") {
-    LockManager[IO].tryExclusive("lock").use(IO.pure).assert
+  test("exclusivity") {
+    LockManager[IO].exclusive("lock").surround(IO.never).start.flatMap { f =>
+      IO.sleep(1.second) *>
+        LockManager[IO].tryExclusive("lock").use(IO.pure(_)).map(!_).assert *>
+        f.cancel *>
+        LockManager[IO].tryExclusive("lock").use(IO.pure(_)).assert
+    }
   }
 
 }
