@@ -18,7 +18,7 @@ libraryDependencies += "com.armanbilge" %%% "fs2-dom" % "0.1.0-M1"
 - [`ReadableStream`] conversions
 - [`EventTarget`] listeners
 - Lifecycle-managed [`AbortSignal`]s
-- Wrappers for [`Clipboard`], [`History`], [`Storage`] APIs
+- Wrappers for [`Clipboard`], [`History`], [`Lock`], [`Storage`] APIs
 - [`Serializable`] typeclass
 - Contributions welcome!
 
@@ -27,5 +27,6 @@ libraryDependencies += "com.armanbilge" %%% "fs2-dom" % "0.1.0-M1"
 [`AbortSignal`]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal
 [`Clipboard`]: https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API
 [`History`]: https://developer.mozilla.org/en-US/docs/Web/API/History
+[`Lock`]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Locks_API
 [`Storage`]: https://developer.mozilla.org/en-US/docs/Web/API/Storage
 [`Serializable`]: https://developer.mozilla.org/en-US/docs/Glossary/Serializable_object
