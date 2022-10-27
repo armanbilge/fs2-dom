@@ -47,4 +47,18 @@ class LockManagerSuite extends CatsEffectSuite {
     }
   }
 
+  test("acquire cancelability") {
+    LockManager[IO].exclusive("lock").surround {
+      IO.ref(true).flatMap { ref =>
+        LockManager[IO]
+          .exclusive("lock")
+          .surround(ref.set(false))
+          .as(false)
+          .timeoutTo(1.second, IO(true))
+          .assert *> ref.get.assert // assert it timed out before running
+      }
+
+    }
+  }
+
 }
