@@ -30,7 +30,7 @@ private[dom] object EventTargetHelpers {
 
   def listen[F[_], E <: Event](target: EventTarget, `type`: String)(implicit
       F: Async[F]
-  ): Stream[F, E] = {
+  ): Resource[F, Stream[F, E]] = {
     val setup = for {
       dispatcher <- Dispatcher.sequential[F]
       abort <- AbortController[F]
@@ -49,7 +49,7 @@ private[dom] object EventTargetHelpers {
       }
     } yield ch
 
-    Stream.resource(setup).flatMap(_.stream)
+    setup.map(_.stream)
   }
 
 }
