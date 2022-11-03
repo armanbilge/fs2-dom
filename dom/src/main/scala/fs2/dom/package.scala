@@ -45,6 +45,12 @@ package object dom {
     stream.through(toReadableStream).compile.resource.lastOrError
 
   def events[F[_]: Async, E <: Event](target: EventTarget, `type`: String): Stream[F, E] =
+    Stream.resource(EventTargetHelpers.listen(target, `type`)).flatten
+
+  def eventsResource[F[_]: Async, E <: Event](
+      target: EventTarget,
+      `type`: String
+  ): Resource[F, Stream[F, E]] =
     EventTargetHelpers.listen(target, `type`)
 
 }
