@@ -16,41 +16,32 @@
 
 package fs2
 
-import cats.effect.kernel.Async
+import cats.effect.kernel.MonadCancel
 import cats.effect.kernel.Resource
-import cats.syntax.all._
-import org.scalajs.dom.Blob
-import org.scalajs.dom.ReadableStream
-
-import scala.scalajs.js.typedarray.Uint8Array
+import cats.MonadThrow
 import org.scalajs.dom.Event
 import org.scalajs.dom.EventTarget
+import org.scalajs.dom.ReadableStream
+import scala.scalajs.js.typedarray.Uint8Array
 
 package object dom {
 
-  def readBlob[F[_]](blob: F[Blob])(implicit F: Async[F]): Stream[F, Byte] =
-    readReadableStream(blob.flatMap(b => F.delay(b.stream())))
-
-  def readReadableStream[F[_]: Async](
-      readableStream: F[ReadableStream[Uint8Array]],
-      cancelAfterUse: Boolean = true
-  ): Stream[F, Byte] = StreamConverters.readReadableStream(readableStream, cancelAfterUse)
-
-  def toReadableStream[F[_]: Async]: Pipe[F, Byte, ReadableStream[Uint8Array]] =
-    StreamConverters.toReadableStream
-
-  def toReadableStreamResource[F[_]: Async](
+  def toReadableStreamResource[F[_]: ReadableStreamDsl : Compiler[*[_], F] : Compiler[*[_], Resource[F, *]] : MonadThrow](
       stream: Stream[F, Byte]
   ): Resource[F, ReadableStream[Uint8Array]] =
-    stream.through(toReadableStream).compile.resource.lastOrError
+    stream
+      .through(ReadableStreamDsl[F].toReadableStream)
+      .compile[F, F, ReadableStream[Uint8Array]]
+      .resource
+      .lastOrError
 
-  def events[F[_]: Async, E <: Event](target: EventTarget, `type`: String): Stream[F, E] =
-    Stream.resource(EventTargetHelpers.listen(target, `type`)).flatten
+  def events[F[_]: EventTargetDsl : MonadCancel[*[_], Throwable], E <: Event](target: EventTarget, `type`: String): Stream[F, E] =
+    Stream.resource(EventTargetDsl[F].listen(target, `type`)).flatten
 
-  def eventsResource[F[_]: Async, E <: Event](
+  def eventsResource[F[_]: EventTargetDsl, E <: Event](
       target: EventTarget,
       `type`: String
   ): Resource[F, Stream[F, E]] =
-    EventTargetHelpers.listen(target, `type`)
+    EventTargetDsl[F].listen(target, `type`)
 
 }

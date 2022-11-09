@@ -21,9 +21,17 @@ import cats.effect.kernel.Resource
 import cats.effect.kernel.Sync
 import org.scalajs.dom
 
-object AbortController {
-  def apply[F[_]](implicit F: Sync[F]): Resource[F, dom.AbortSignal] =
-    Resource
-      .make(F.delay(new dom.AbortController))(ctrl => F.delay(ctrl.abort()))
-      .map(_.signal)
+trait AbortDsl[F[_]] {
+  def abortSignal: Resource[F, dom.AbortSignal]
+}
+
+object AbortDsl {
+  implicit def interpreter[F[_] : Sync]: AbortDsl[F] = new AbortDsl[F] {
+    override def abortSignal: Resource[F,dom.AbortSignal] =
+      Resource
+        .make(Sync[F].delay(new dom.AbortController))(ctrl => Sync[F].delay(ctrl.abort()))
+        .map(_.signal)
+  }
+
+  def apply[F[_]](implicit ev: AbortDsl[F]) = ev
 }

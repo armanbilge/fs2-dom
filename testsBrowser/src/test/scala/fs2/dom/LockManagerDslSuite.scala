@@ -21,36 +21,36 @@ import munit.CatsEffectSuite
 
 import scala.concurrent.duration._
 
-class LockManagerSuite extends CatsEffectSuite {
+class LockManagerDslSuite extends CatsEffectSuite {
 
   test("no contention") {
     IO.ref(false).flatMap { ref =>
-      LockManager[IO].exclusive("lock").surround(ref.set(true)) *> ref.get.assert
+      LockManagerDsl[IO].exclusive("lock").surround(ref.set(true)) *> ref.get.assert
     }
   }
 
   test("use cancelable") {
-    val cancel = LockManager[IO].exclusive("lock").surround(IO.never).timeoutTo(1.second, IO.unit)
+    val cancel = LockManagerDsl[IO].exclusive("lock").surround(IO.never).timeoutTo(1.second, IO.unit)
     val reacquire = IO.ref(false).flatMap { ref =>
-      LockManager[IO].exclusive("lock").surround(ref.set(true)) *> ref.get.assert
+      LockManagerDsl[IO].exclusive("lock").surround(ref.set(true)) *> ref.get.assert
     }
 
     cancel *> reacquire
   }
 
   test("exclusivity") {
-    LockManager[IO].exclusive("lock").surround(IO.never).start.flatMap { f =>
+    LockManagerDsl[IO].exclusive("lock").surround(IO.never).start.flatMap { f =>
       IO.sleep(1.second) *>
-        LockManager[IO].tryExclusive("lock").use(IO.pure(_)).map(!_).assert *>
+        LockManagerDsl[IO].tryExclusive("lock").use(IO.pure(_)).map(!_).assert *>
         f.cancel *>
-        LockManager[IO].tryExclusive("lock").use(IO.pure(_)).assert
+        LockManagerDsl[IO].tryExclusive("lock").use(IO.pure(_)).assert
     }
   }
 
   test("acquire cancelability") {
-    LockManager[IO].exclusive("lock").surround {
+    LockManagerDsl[IO].exclusive("lock").surround {
       IO.ref(true).flatMap { ref =>
-        LockManager[IO]
+        LockManagerDsl[IO]
           .exclusive("lock")
           .surround(ref.set(false))
           .as(false)

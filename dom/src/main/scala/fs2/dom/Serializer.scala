@@ -16,8 +16,8 @@
 
 package fs2.dom
 
-import cats.Invariant
 import cats.effect.kernel.Sync
+import cats.Invariant
 import cats.syntax.all._
 import io.circe.Decoder
 import io.circe.Encoder
@@ -57,5 +57,7 @@ object Serializer {
     def serialize(a: A): F[js.Any] = F.delay(a.asJsAny)
     def deserialize(serialized: js.Any): F[A] = decodeJs[A](serialized).liftTo[F]
   }
+
+  def apply[F[_], A](implicit ev: Serializer[F, A]) = ev
 
 }

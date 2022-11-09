@@ -20,14 +20,14 @@ import cats.data.OptionT
 import cats.effect.kernel.Async
 import cats.effect.kernel.Ref
 import cats.syntax.all._
-import fs2.Stream
 import fs2.concurrent.Signal
+import fs2.Stream
 import org.scalajs.dom.EventListenerOptions
 import org.scalajs.dom.PopStateEvent
 import org.scalajs.dom.ScrollRestoration
 import org.scalajs.dom.window
 
-abstract class History[F[_], S] private {
+trait HistoryDsl[F[_], S] {
 
   def state: Signal[F, Option[S]]
   def length: Signal[F, Int]
@@ -46,9 +46,9 @@ abstract class History[F[_], S] private {
 
 }
 
-object History {
-  def apply[F[_], S](implicit F: Async[F], serializer: Serializer[F, S]): History[F, S] =
-    new History[F, S] {
+object HistoryDsl {
+  implicit def interpreter[F[_], S](implicit F: Async[F], serializer: Serializer[F, S]): HistoryDsl[F, S] =
+    new HistoryDsl[F, S] {
 
       def state = new Signal[F, Option[S]] {
         def discrete =
@@ -101,4 +101,7 @@ object History {
         thunk
       }
     }
+
+  def apply[F[_], S](implicit ev: HistoryDsl[F, S]) = ev
+
 }

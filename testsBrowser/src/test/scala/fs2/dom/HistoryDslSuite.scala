@@ -22,10 +22,10 @@ import munit.CatsEffectSuite
 
 import scala.concurrent.duration._
 
-class HistorySuite extends CatsEffectSuite {
+class HistoryDslSuite extends CatsEffectSuite {
 
   test("history") {
-    val history = History[IO, Int]
+    val history = HistoryDsl[IO, Int]
     Channel.unbounded[IO, Int].flatMap { ch =>
       history.state.discrete.unNone.through(ch.sendAll).compile.drain.background.surround {
         for {

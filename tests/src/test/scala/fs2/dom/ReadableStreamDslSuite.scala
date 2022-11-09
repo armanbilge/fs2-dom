@@ -22,7 +22,7 @@ import munit.CatsEffectSuite
 import munit.ScalaCheckEffectSuite
 import org.scalacheck.effect.PropF.forAllF
 
-class StreamConversionSuite extends CatsEffectSuite with ScalaCheckEffectSuite {
+class ReadableStreamDslSuite extends CatsEffectSuite with ScalaCheckEffectSuite {
 
   test("to/read ReadableStream") {
     forAllF { (chunks: Vector[Vector[Byte]]) =>
@@ -30,8 +30,8 @@ class StreamConversionSuite extends CatsEffectSuite with ScalaCheckEffectSuite {
         .emits(chunks)
         .map(Chunk.seq(_))
         .unchunks
-        .through(toReadableStream[IO])
-        .flatMap(readable => readReadableStream(IO(readable)))
+        .through(ReadableStreamDsl[IO].toReadableStream)
+        .flatMap(readable => ReadableStreamDsl[IO].readReadableStream(IO(readable), false))
         .compile
         .toVector
         .assertEquals(chunks.flatten)

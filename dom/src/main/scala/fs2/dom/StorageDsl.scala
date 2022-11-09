@@ -17,33 +17,43 @@
 package fs2
 package dom
 
-import cats.syntax.all._
 import cats.effect.kernel.Async
+import cats.syntax.all._
 import org.scalajs.dom
 
-abstract class Storage[F[_]] private {
+trait StorageDsl[F[_]] {
 
-  def events: Stream[F, Storage.Event]
+  def events(typ: StorageDsl.Type): Stream[F, StorageDsl.Event]
 
-  def length: F[Int]
+  def length(typ: StorageDsl.Type): F[Int]
 
-  def getItem(key: String): F[Option[String]]
+  def getItem(typ: StorageDsl.Type, key: String): F[Option[String]]
 
-  def setItem(key: String, item: String): F[Unit]
+  def setItem(typ: StorageDsl.Type, key: String, item: String): F[Unit]
 
-  def removeItem(key: String): F[Unit]
+  def removeItem(typ: StorageDsl.Type, key: String): F[Unit]
 
-  def key(i: Int): F[Option[String]]
+  def key(typ: StorageDsl.Type, i: Int): F[Option[String]]
 
-  def clear: F[Unit]
-
+  def clear(typ: StorageDsl.Type): F[Unit]
 }
 
-object Storage {
+object StorageDsl {
 
-  def local[F[_]: Async]: Storage[F] = apply(dom.window.localStorage)
+  sealed trait Type {
+    final def fold[X](onLocal: => X,
+                      onSession: => X): X = this match {
+      case Type.Local => onLocal
+      case Type.Session => onSession
+    }
 
-  def session[F[_]: Async]: Storage[F] = apply(dom.window.sessionStorage)
+    private[StorageDsl] def toScalaJsDom = fold(dom.window.localStorage, dom.window.sessionStorage)
+  }
+
+  object Type {
+    case object Local extends Type
+    case object Session extends Type
+  }
 
   sealed abstract class Event {
     def url: String
@@ -56,7 +66,7 @@ object Storage {
     final case class Updated private (key: String, oldValue: String, newValue: String, url: String)
         extends Event
 
-    private[Storage] def fromStorageEvent(ev: dom.StorageEvent): Event =
+    private[StorageDsl] def fromStorageEvent(ev: dom.StorageEvent): Event =
       Option(ev.key).fold[Event](Cleared(ev.url)) { key =>
         (Option(ev.oldValue), Option(ev.newValue)) match {
           case (Some(oldValue), None)           => Removed(key, oldValue, ev.url)
@@ -67,31 +77,34 @@ object Storage {
       }
   }
 
-  private[dom] def apply[F[_]](storage: dom.Storage)(implicit F: Async[F]): Storage[F] =
-    new Storage[F] {
+  implicit def interpreter[F[_]](implicit F: Async[F]): StorageDsl[F] =
+    new StorageDsl[F] {
 
-      def events =
+      def events(typ: Type) =
         fs2.dom.events[F, dom.StorageEvent](dom.window, "storage").mapFilter { ev =>
-          if (ev.storageArea eq storage)
+          if (ev.storageArea eq typ.toScalaJsDom)
             Some(Event.fromStorageEvent(ev))
           else
             None
         }
 
-      def length = F.delay(storage.length)
+      def length(typ: Type) = F.delay(typ.toScalaJsDom.length)
 
-      def getItem(key: String) =
-        F.delay(Option(storage.getItem(key)))
+      def getItem(typ: Type, key: String) =
+        F.delay(Option(typ.toScalaJsDom.getItem(key)))
 
-      def setItem(key: String, item: String) =
-        F.delay(storage.setItem(key, item))
+      def setItem(typ: Type, key: String, item: String) =
+        F.delay(typ.toScalaJsDom.setItem(key, item))
 
-      def removeItem(key: String) =
-        F.delay(storage.removeItem(key))
+      def removeItem(typ: Type, key: String) =
+        F.delay(typ.toScalaJsDom.removeItem(key))
 
-      def key(i: Int) = F.delay(Option(storage.key(i)))
+      def key(typ: Type, i: Int) = F.delay(Option(typ.toScalaJsDom.key(i)))
 
-      def clear = F.delay(storage.clear())
+      def clear(typ: Type) = F.delay(typ.toScalaJsDom.clear())
 
     }
+
+  def apply[F[_]](implicit ev: StorageDsl[F]) = ev
 }
+

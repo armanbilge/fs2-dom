@@ -28,7 +28,7 @@ import org.scalajs.dom.window
 
 import scala.scalajs.js
 
-abstract class LockManager[F[_]] private {
+trait LockManagerDsl[F[_]] {
 
   def exclusive(name: String): Resource[F, Unit]
 
@@ -37,16 +37,15 @@ abstract class LockManager[F[_]] private {
   def shared(name: String): Resource[F, Unit]
 
   def tryShared(name: String): Resource[F, Boolean]
-
 }
 
-object LockManager {
+object LockManagerDsl {
 
-  def apply[F[_]: Async]: LockManager[F] =
-    apply(window.navigator.asInstanceOf[js.Dynamic].locks.asInstanceOf[facade.LockManager])
+  implicit def interpreter[F[_]: Async]: LockManagerDsl[F] =
+    helper(window.navigator.asInstanceOf[js.Dynamic].locks.asInstanceOf[facade.LockManager])
 
-  private def apply[F[_]](manager: facade.LockManager)(implicit F: Async[F]): LockManager[F] =
-    new LockManager[F] {
+  private def helper[F[_]](manager: facade.LockManager)(implicit F: Async[F]): LockManagerDsl[F] =
+    new LockManagerDsl[F] {
 
       def exclusive(name: String) = request(name, "exclusive", false).void
 
@@ -93,5 +92,7 @@ object LockManager {
 
         } yield Option(lock)
     }
+
+  def apply[F[_]](implicit ev: LockManagerDsl[F]) = ev
 
 }

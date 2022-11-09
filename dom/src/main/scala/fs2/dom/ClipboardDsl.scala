@@ -17,9 +17,10 @@
 package fs2.dom
 
 import cats.effect.kernel.Async
+import cats.effect.kernel.Sync
 import org.scalajs.dom.window
 
-abstract class Clipboard[F[_]] private {
+trait ClipboardDsl[F[_]] {
 
   def readText: F[String]
 
@@ -27,14 +28,16 @@ abstract class Clipboard[F[_]] private {
 
 }
 
-object Clipboard {
+object ClipboardDsl {
 
-  def apply[F[_]](implicit F: Async[F]): Clipboard[F] = new Clipboard[F] {
+  implicit def interpreter[F[_] : Async]: ClipboardDsl[F] = new ClipboardDsl[F] {
 
-    def readText = F.fromPromise(F.delay(window.navigator.clipboard.readText()))
+    def readText = Async[F].fromPromise(Sync[F].delay(window.navigator.clipboard.readText()))
 
-    def writeText(text: String) = F.fromPromise(F.delay(window.navigator.clipboard.writeText(text)))
+    def writeText(text: String) = Async[F].fromPromise(Sync[F].delay(window.navigator.clipboard.writeText(text)))
 
   }
+
+  def apply[F[_]](implicit ev: ClipboardDsl[F]) = ev
 
 }
