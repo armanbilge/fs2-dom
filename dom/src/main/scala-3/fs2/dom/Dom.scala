@@ -48,8 +48,13 @@ object Document {
   def apply[F[_]: Dom]: Document[F] = dom.window.document
 
   extension [F[_]](document: Document[F]) {
-    def getElementById(id: String)(using F: Dom[F]) =
+
+    def createElement(tagName: String)(using F: Dom[F]): F[Element[F]] =
+      F.delay(document.createElement(tagName))
+
+    def getElementById(id: String)(using F: Dom[F]): F[Option[HtmlElement[F]]] =
       F.delay(Option(document.getElementById(id).asInstanceOf[HtmlElement[F]]))
+
   }
 }
 
