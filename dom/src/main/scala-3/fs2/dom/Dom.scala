@@ -31,6 +31,9 @@ opaque type Node[F[_]] = dom.Node
 object Node {
   extension [F[_]](node: Node[F]) {
 
+    def firstChild(using F: Dom[F]): F[Option[Node[F]]] =
+      F.delay(Option(node.firstChild))
+
     def appendChild(child: Node[F])(using F: Dom[F]): F[Unit] = F.delay {
       node.appendChild(child)
       ()
