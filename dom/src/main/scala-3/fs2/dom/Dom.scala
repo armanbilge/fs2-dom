@@ -39,6 +39,7 @@ opaque type HtmlFieldSetElement[F[_]] <: HtmlElement[F] = dom.HTMLFieldSetElemen
 opaque type HtmlFormElement[F[_]] <: HtmlElement[F] = dom.HTMLFormElement
 opaque type HtmlHeadElement[F[_]] <: HtmlElement[F] = dom.HTMLHeadElement
 opaque type HtmlHrElement[F[_]] <: HtmlElement[F] = dom.HTMLHRElement
+opaque type HtmlHtmlElement[F[_]] <: HtmlElement[F] = dom.HTMLHtmlElement
 opaque type HtmlIFrameElement[F[_]] <: HtmlElement[F] = dom.HTMLIFrameElement
 opaque type HtmlImageElement[F[_]] <: HtmlElement[F] = dom.HTMLImageElement
 opaque type HtmlInputElement[F[_]] <: HtmlElement[F] = dom.HTMLInputElement
