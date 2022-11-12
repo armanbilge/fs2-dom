@@ -43,6 +43,16 @@ object Node {
   }
 }
 
+opaque type Document[F[_]] <: Node[F] = dom.Document
+object Document {
+  def apply[F[_]: Dom]: Document[F] = dom.window.document
+
+  extension [F[_]](document: Document[F]) {
+    def getElementById(id: String)(using F: Dom[F]) =
+      F.delay(Option(document.getElementById(id).asInstanceOf[HtmlElement[F]]))
+  }
+}
+
 opaque type Element[F[_]] <: Node[F] = dom.Element
 opaque type HtmlElement[F[_]] <: Element[F] = dom.HTMLElement
 opaque type HtmlAnchorElement[F[_]] <: HtmlElement[F] = dom.HTMLAnchorElement
