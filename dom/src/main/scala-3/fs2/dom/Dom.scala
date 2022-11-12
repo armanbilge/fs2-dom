@@ -121,9 +121,16 @@ object Dom {
     }
 
     extension (input: HtmlInputElement[F]) {
+      private inline def self = input.asInstanceOf[dom.HTMLInputElement]
+
+      def checked: Ref[F, Boolean] =
+        new WrappedRef[F, Boolean] {
+          def unsafeGet() = self.checked
+          def unsafeSet(b: Boolean) = self.checked = b
+        }
+
       def value: Ref[F, String] =
         new WrappedRef[F, String] {
-          inline def self = input.asInstanceOf[dom.HTMLInputElement]
           def unsafeGet() = self.value
           def unsafeSet(s: String) = self.value = s
         }
