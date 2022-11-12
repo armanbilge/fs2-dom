@@ -19,7 +19,10 @@ package fs2.dom
 import cats.effect.IO
 import cats.effect.kernel.Async
 import cats.effect.kernel.Ref
+import cats.effect.kernel.Resource
+import fs2.Stream
 import org.scalajs.dom
+import org.scalajs.dom.Event
 
 opaque type Dom[F[_]] = Async[F]
 object Dom {
@@ -48,8 +51,23 @@ object Node {
       node.replaceChild(newChild, oldChild)
       ()
     }
+
+    def addEventListener[T <: Event](`type`: String, options: EventListenerOptions)(using
+        F: Dom[F]
+    ): Resource[F, Stream[F, T]] =
+      EventTargetHelpers.listen(node, `type`, options)
+
+    def attributes(using F: Dom[F]): F[NamedNodeMap[F]] =
+      F.delay(node.attributes)
+
+    def nodeType: Int = node.nodeType
+
+    def previousSibling(using F: Dom[F]): F[Node[F]] =
+      F.delay(node.previousSibling)
   }
 }
+
+opaque type NamedNodeMap[F[_]] = dom.NamedNodeMap
 
 opaque type Document[F[_]] <: Node[F] = dom.Document
 object Document {
