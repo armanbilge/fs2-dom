@@ -40,6 +40,11 @@ object Node {
       node.removeChild(child)
       ()
     }
+
+    def replaceChild(newChild: Node[F], oldChild: Node[F])(using F: Dom[F]): F[Unit] = F.delay {
+      node.replaceChild(newChild, oldChild)
+      ()
+    }
   }
 }
 
