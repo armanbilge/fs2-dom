@@ -28,6 +28,21 @@ object Dom {
 }
 
 opaque type Node[F[_]] = dom.Node
+object Node {
+  extension [F[_]](node: Node[F]) {
+
+    def appendChild(child: Node[F])(using F: Dom[F]): F[Unit] = F.delay {
+      node.appendChild(child)
+      ()
+    }
+
+    def removeChild(child: Node[F])(using F: Dom[F]): F[Unit] = F.delay {
+      node.removeChild(child)
+      ()
+    }
+  }
+}
+
 opaque type Element[F[_]] <: Node[F] = dom.Element
 opaque type HtmlElement[F[_]] <: Element[F] = dom.HTMLElement
 opaque type HtmlAnchorElement[F[_]] <: HtmlElement[F] = dom.HTMLAnchorElement
