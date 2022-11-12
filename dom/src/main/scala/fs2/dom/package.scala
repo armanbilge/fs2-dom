@@ -25,8 +25,11 @@ import org.scalajs.dom.ReadableStream
 import scala.scalajs.js.typedarray.Uint8Array
 
 package object dom {
+  type C[F[_]] = Compiler[F, F]
+  type CR[F[_]] = Compiler[F, Resource[F, *]]
+  type MonadCancelThrow[F[_]] = MonadCancel[F, Throwable]
 
-  def toReadableStreamResource[F[_]: ReadableStreamDsl : Compiler[*[_], F] : Compiler[*[_], Resource[F, *]] : MonadThrow](
+  def toReadableStreamResource[F[_]: ReadableStreamDsl : C : CR : MonadThrow](
       stream: Stream[F, Byte]
   ): Resource[F, ReadableStream[Uint8Array]] =
     stream
@@ -35,7 +38,7 @@ package object dom {
       .resource
       .lastOrError
 
-  def events[F[_]: EventTargetDsl : MonadCancel[*[_], Throwable], E <: Event](target: EventTarget, `type`: String): Stream[F, E] =
+  def events[F[_]: EventTargetDsl : MonadCancelThrow, E <: Event](target: EventTarget, `type`: String): Stream[F, E] =
     Stream.resource(EventTargetDsl[F].listen(target, `type`)).flatten
 
   def eventsResource[F[_]: EventTargetDsl, E <: Event](

@@ -60,10 +60,10 @@ object StorageDsl {
   }
 
   object Event {
-    final case class Cleared private (url: String) extends Event
-    final case class Added private (key: String, value: String, url: String) extends Event
-    final case class Removed private (key: String, value: String, url: String) extends Event
-    final case class Updated private (key: String, oldValue: String, newValue: String, url: String)
+    final case class Cleared private[StorageDsl] (url: String) extends Event
+    final case class Added private[StorageDsl] (key: String, value: String, url: String) extends Event
+    final case class Removed private[StorageDsl] (key: String, value: String, url: String) extends Event
+    final case class Updated private[StorageDsl] (key: String, oldValue: String, newValue: String, url: String)
         extends Event
 
     private[StorageDsl] def fromStorageEvent(ev: dom.StorageEvent): Event =

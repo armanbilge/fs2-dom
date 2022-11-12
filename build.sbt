@@ -8,7 +8,7 @@ ThisBuild / tlSonatypeUseLegacyHost := false
 
 val scala213 = "2.13.10"
 ThisBuild / crossScalaVersions := Seq("2.12.17", scala213, "3.2.1")
-ThisBuild / scalaVersion := scala213
+ThisBuild / scalaVersion := "3.2.1"
 
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
 ThisBuild / tlJdkRelease := Some(8)
@@ -59,9 +59,9 @@ lazy val dom = project
     )
   )
 
-import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.firefox.FirefoxOptions
+import org.openqa.selenium.WebDriver
 import org.scalajs.jsenv.JSEnv
 import org.scalajs.jsenv.nodejs.NodeJSEnv
 import org.scalajs.jsenv.selenium.SeleniumJSEnv
