@@ -38,13 +38,11 @@ opaque type HtmlBodyElement[F[_]] <: HtmlElement[F] = dom.HTMLBodyElement
 
 opaque type HtmlButtonElement[F[_]] <: HtmlElement[F] = dom.HTMLButtonElement
 object HtmlButtonElement {
-  extension [F[_]](input: HtmlButtonElement[F]) {
-    private inline def self = input.asInstanceOf[dom.HTMLButtonElement]
-
+  extension [F[_]](button: HtmlButtonElement[F]) {
     def value(using Dom[F]): Ref[F, String] =
       new WrappedRef[F, String] {
-        def unsafeGet() = self.value
-        def unsafeSet(s: String) = self.value = s
+        def unsafeGet() = button.value
+        def unsafeSet(s: String) = button.value = s
       }
   }
 }
@@ -67,18 +65,16 @@ opaque type HtmlImageElement[F[_]] <: HtmlElement[F] = dom.HTMLImageElement
 opaque type HtmlInputElement[F[_]] <: HtmlElement[F] = dom.HTMLInputElement
 object HtmlInputElement {
   extension [F[_]](input: HtmlInputElement[F]) {
-    private inline def self = input.asInstanceOf[dom.HTMLInputElement]
-
     def checked(using Dom[F]): Ref[F, Boolean] =
       new WrappedRef[F, Boolean] {
-        def unsafeGet() = self.checked
-        def unsafeSet(b: Boolean) = self.checked = b
+        def unsafeGet() = input.checked
+        def unsafeSet(b: Boolean) = input.checked = b
       }
 
     def value(using Dom[F]): Ref[F, String] =
       new WrappedRef[F, String] {
-        def unsafeGet() = self.value
-        def unsafeSet(s: String) = self.value = s
+        def unsafeGet() = input.value
+        def unsafeSet(s: String) = input.value = s
       }
   }
 }
@@ -97,13 +93,11 @@ opaque type HtmlOptGroupElement[F[_]] <: HtmlElement[F] = dom.HTMLOptGroupElemen
 
 opaque type HtmlOptionElement[F[_]] <: HtmlElement[F] = dom.HTMLOptionElement
 object HtmlOptionElement {
-  extension [F[_]](input: HtmlOptionElement[F]) {
-    private inline def self = input.asInstanceOf[dom.HTMLOptionElement]
-
+  extension [F[_]](option: HtmlOptionElement[F]) {
     def value(using Dom[F]): Ref[F, String] =
       new WrappedRef[F, String] {
-        def unsafeGet() = self.value
-        def unsafeSet(s: String) = self.value = s
+        def unsafeGet() = option.value
+        def unsafeSet(s: String) = option.value = s
       }
   }
 }
@@ -117,13 +111,11 @@ opaque type HtmlScriptElement[F[_]] <: HtmlElement[F] = dom.HTMLScriptElement
 
 opaque type HtmlSelectElement[F[_]] <: HtmlElement[F] = dom.HTMLSelectElement
 object HtmlSelectElement {
-  extension [F[_]](input: HtmlSelectElement[F]) {
-    private inline def self = input.asInstanceOf[dom.HTMLSelectElement]
-
+  extension [F[_]](select: HtmlSelectElement[F]) {
     def value(using Dom[F]): Ref[F, String] =
       new WrappedRef[F, String] {
-        def unsafeGet() = self.value
-        def unsafeSet(s: String) = self.value = s
+        def unsafeGet() = select.value
+        def unsafeSet(s: String) = select.value = s
       }
   }
 }
@@ -140,13 +132,11 @@ opaque type HtmlTableSectionElement[F[_]] <: HtmlElement[F] = dom.HTMLTableSecti
 
 opaque type HtmlTextAreaElement[F[_]] <: HtmlElement[F] = dom.HTMLTextAreaElement
 object HtmlTextAreaElement {
-  extension [F[_]](input: HtmlTextAreaElement[F]) {
-    private inline def self = input.asInstanceOf[dom.HTMLTextAreaElement]
-
+  extension [F[_]](textArea: HtmlTextAreaElement[F]) {
     def value(using Dom[F]): Ref[F, String] =
       new WrappedRef[F, String] {
-        def unsafeGet() = self.value
-        def unsafeSet(s: String) = self.value = s
+        def unsafeGet() = textArea.value
+        def unsafeSet(s: String) = textArea.value = s
       }
   }
 }
