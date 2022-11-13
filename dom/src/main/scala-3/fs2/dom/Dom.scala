@@ -64,6 +64,123 @@ object Node {
 
     def previousSibling(using F: Dom[F]): F[Node[F]] =
       F.delay(node.previousSibling)
+
+    def localName(using F: Dom[F]): F[String] = F.delay(node.localName)
+
+    def namespaceURI(using F: Dom[F]): F[Option[String]] = F.delay(Option(node.namespaceURI))
+
+    def textContent(using F: Dom[F]): F[String] = F.delay(node.textContent)
+
+    def setTextContent(s: String)(using F: Dom[F]): F[Unit] = F.delay(node.textContent = s)
+
+    def parentNode(using F: Dom[F]): F[Node[F]] = F.delay(node.parentNode)
+
+    def nextSibling(using F: Dom[F]): F[Option[Node[F]]] = F.delay(Option(node.nextSibling))
+
+    def nodeValue(using F: Dom[F]): F[String] = F.delay(node.nodeValue)
+
+    def setNodeValue(s: String)(using F: Dom[F]): F[Unit] = F.delay(node.nodeValue = s)
+
+    def lastChild(using F: Dom[F]): F[Option[Node[F]]] = F.delay(Option(node.lastChild))
+
+    def childNodes(using F: Dom[F]): F[NodeList[F, Node[F]]] = F.delay(node.childNodes)
+
+    def nodeName: Option[String] = Option(node.nodeName)
+
+    def ownerDocument(using F: Dom[F]): F[Option[Document[F]]] = F.delay(Option(node.ownerDocument))
+
+    def lookupPrefix(namespaceURI: String)(using F: Dom[F]): F[Option[String]] =
+      F.delay(Option(node.lookupPrefix(namespaceURI)))
+
+    def isDefaultNamespace(namespaceURI: String)(using F: Dom[F]): F[Boolean] =
+      F.delay(node.isDefaultNamespace(namespaceURI))
+
+    def compareDocumentPosition(other: Node[F])(using F: Dom[F]): F[Int] =
+      F.delay(node.compareDocumentPosition(other))
+
+    def normalize(using F: Dom[F]): F[Unit] = F.delay(node.normalize())
+
+    def isSameNode(other: Node[F])(using F: Dom[F]): F[Boolean] = F.delay(node.isSameNode(other))
+
+    def contains(otherNode: Node[F])(using F: Dom[F]): F[Boolean] =
+      F.delay(node.contains(otherNode))
+
+    def hasAttributes(using F: Dom[F]): F[Boolean] = F.delay(node.hasAttributes())
+
+    def lookupNamespaceURI(prefix: String)(using F: Dom[F]): F[Option[String]] =
+      F.delay(Option(node.lookupNamespaceURI(prefix)))
+
+    def cloneNode(deep: Boolean)(using F: Dom[F]): F[Node[F]] = F.delay(node.cloneNode(deep))
+
+    def hasChildNodes(using F: Dom[F]): F[Boolean] = F.delay(node.hasChildNodes())
+
+    def insertBefore(newChild: Node[F], refChild: Node[F])(using F: Dom[F]): F[Node[F]] =
+      F.delay(node.insertBefore(newChild, refChild))
+
+    def baseURI(using F: Dom[F]): F[String] = F.delay(node.baseURI)
+
+    def isConnected(using F: Dom[F]): F[Boolean] = F.delay(node.isConnected)
+
+    def innerText(using F: Dom[F]): F[String] = F.delay(node.innerText)
+
+    def setInnerText(s: String)(using F: Dom[F]): F[Unit] = F.delay(node.innerText = s)
+  }
+
+  val ENTITY_REFERENCE_NODE: Int = dom.Node.ENTITY_REFERENCE_NODE
+
+  val ATTRIBUTE_NODE: Int = dom.Node.ATTRIBUTE_NODE
+
+  val DOCUMENT_FRAGMENT_NODE: Int = dom.Node.DOCUMENT_FRAGMENT_NODE
+
+  val TEXT_NODE: Int = dom.Node.TEXT_NODE
+
+  val ELEMENT_NODE: Int = dom.Node.ELEMENT_NODE
+
+  val COMMENT_NODE: Int = dom.Node.COMMENT_NODE
+
+  val DOCUMENT_POSITION_DISCONNECTED: Int = dom.Node.DOCUMENT_POSITION_DISCONNECTED
+
+  val DOCUMENT_POSITION_CONTAINED_BY: Int = dom.Node.DOCUMENT_POSITION_CONTAINED_BY
+
+  val DOCUMENT_POSITION_CONTAINS: Int = dom.Node.DOCUMENT_POSITION_CONTAINS
+
+  val DOCUMENT_TYPE_NODE: Int = dom.Node.DOCUMENT_TYPE_NODE
+
+  val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Int =
+    dom.Node.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
+
+  val DOCUMENT_NODE: Int = dom.Node.DOCUMENT_NODE
+
+  val ENTITY_NODE: Int = dom.Node.ENTITY_NODE
+
+  val PROCESSING_INSTRUCTION_NODE: Int = dom.Node.PROCESSING_INSTRUCTION_NODE
+
+  val CDATA_SECTION_NODE: Int = dom.Node.CDATA_SECTION_NODE
+
+  val NOTATION_NODE: Int = dom.Node.NOTATION_NODE
+
+  val DOCUMENT_POSITION_FOLLOWING: Int = dom.Node.DOCUMENT_POSITION_FOLLOWING
+
+  val DOCUMENT_POSITION_PRECEDING: Int = dom.Node.DOCUMENT_POSITION_PRECEDING
+}
+
+opaque type DOMList[F[_], +A] = dom.DOMList[A]
+
+object DOMList {
+  extension [F[_], A <: Node[F]](domList: DOMList[F, A]) {
+    def apply(index: Int)(using F: Dom[F]): F[A] = F.delay(domList(index))
+    def length(using F: Dom[F]): F[Int] = F.delay(domList.length)
+  }
+
+  implicit def domListAsList[F[_], T](domList: DOMList[F, T]): List[T] =
+    dom.DOMList.domListAsSeq(domList).toList
+}
+
+opaque type NodeList[F[_], +A <: Node[F]] <: DOMList[F, A] = dom.NodeList[A]
+
+object NodeList {
+  extension [F[_], A <: Node[F]](nodeList: NodeList[F, A]) {
+    def item(index: Int)(using F: Dom[F]): F[A] = F.delay(nodeList.item(index))
   }
 }
 
