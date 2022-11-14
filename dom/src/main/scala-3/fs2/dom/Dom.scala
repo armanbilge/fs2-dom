@@ -22,7 +22,6 @@ import cats.effect.kernel.Ref
 import cats.effect.kernel.Resource
 import fs2.Stream
 import org.scalajs.dom
-import org.scalajs.dom.Attr
 import org.scalajs.dom.Event
 import org.scalajs.dom.EventListenerOptions
 
@@ -71,17 +70,21 @@ object Node {
 
     def namespaceURI(using F: Dom[F]): F[Option[String]] = F.delay(Option(node.namespaceURI))
 
-    def textContent(using F: Dom[F]): F[String] = F.delay(node.textContent)
-
-    def setTextContent(s: String)(using F: Dom[F]): F[Unit] = F.delay(node.textContent = s)
+    def textContent(using F: Dom[F]): Ref[F, String] =
+      new WrappedRef {
+        def unsafeGet() = node.textContent
+        def unsafeSet(s: String) = node.textContent = s
+      }
 
     def parentNode(using F: Dom[F]): F[Node[F]] = F.delay(node.parentNode)
 
     def nextSibling(using F: Dom[F]): F[Option[Node[F]]] = F.delay(Option(node.nextSibling))
 
-    def nodeValue(using F: Dom[F]): F[String] = F.delay(node.nodeValue)
-
-    def setNodeValue(s: String)(using F: Dom[F]): F[Unit] = F.delay(node.nodeValue = s)
+    def nodeValue(using F: Dom[F]): Ref[F, String] =
+      new WrappedRef {
+        def unsafeGet() = node.nodeValue
+        def unsafeSet(s: String) = node.nodeValue = s
+      }
 
     def lastChild(using F: Dom[F]): F[Option[Node[F]]] = F.delay(Option(node.lastChild))
 
@@ -123,9 +126,11 @@ object Node {
 
     def isConnected(using F: Dom[F]): F[Boolean] = F.delay(node.isConnected)
 
-    def innerText(using F: Dom[F]): F[String] = F.delay(node.innerText)
-
-    def setInnerText(s: String)(using F: Dom[F]): F[Unit] = F.delay(node.innerText = s)
+    def innerText(using F: Dom[F]): Ref[F, String] =
+      new WrappedRef {
+        def unsafeGet() = node.innerText
+        def unsafeSet(s: String) = node.innerText = s
+      }
   }
 
   val ENTITY_REFERENCE_NODE: Int = dom.Node.ENTITY_REFERENCE_NODE
@@ -190,26 +195,47 @@ object NamedNodeMap {
   extension [F[_]](nodeMap: NamedNodeMap[F]) {
     def length(using F: Dom[F]): F[Int] = F.delay(nodeMap.length)
 
-    def removeNamedItemNS(namespaceURI: String, localName: String)(using F: Dom[F]): F[Attr] =
+    def removeNamedItemNS(namespaceURI: String, localName: String)(using F: Dom[F]): F[Attr[F]] =
       F.delay(nodeMap.removeNamedItemNS(namespaceURI, localName))
 
-    def item(index: Int)(using F: Dom[F]): F[Attr] = F.delay(nodeMap.item(index))
+    def item(index: Int)(using F: Dom[F]): F[Attr[F]] = F.delay(nodeMap.item(index))
 
-    def apply(index: Int)(using F: Dom[F]): F[Attr] = F.delay(nodeMap(index))
+    def apply(index: Int)(using F: Dom[F]): F[Attr[F]] = F.delay(nodeMap(index))
 
-    def update(index: Int, v: Attr)(using F: Dom[F]): F[Unit] = F.delay(nodeMap.update(index, v))
+    def update(index: Int, v: Attr[F])(using F: Dom[F]): F[Unit] = F.delay(nodeMap.update(index, v))
 
-    def removeNamedItem(name: String)(using F: Dom[F]): F[Attr] =
+    def removeNamedItem(name: String)(using F: Dom[F]): F[Attr[F]] =
       F.delay(nodeMap.removeNamedItem(name))
 
-    def getNamedItem(name: String)(using F: Dom[F]): F[Attr] = F.delay(nodeMap.getNamedItem(name))
+    def getNamedItem(name: String)(using F: Dom[F]): F[Option[Attr[F]]] =
+      F.delay(Option(nodeMap.getNamedItem(name)))
 
-    def setNamedItem(arg: Attr)(using F: Dom[F]): F[Attr] = F.delay(nodeMap.setNamedItem(arg))
+    def setNamedItem(arg: Attr[F])(using F: Dom[F]): F[Attr[F]] = F.delay(nodeMap.setNamedItem(arg))
 
-    def getNamedItemNS(namespaceURI: String, localName: String)(using F: Dom[F]): F[Attr] =
-      F.delay(nodeMap.getNamedItemNS(namespaceURI, localName))
+    def getNamedItemNS(namespaceURI: String, localName: String)(using
+        F: Dom[F]
+    ): F[Option[Attr[F]]] =
+      F.delay(Option(nodeMap.getNamedItemNS(namespaceURI, localName)))
 
-    def setNamedItemNS(arg: Attr)(using F: Dom[F]): F[Attr] = F.delay(arg)
+    def setNamedItemNS(arg: Attr[F])(using F: Dom[F]): F[Attr[F]] =
+      F.delay(nodeMap.setNamedItemNS(arg))
+  }
+}
+
+opaque type Attr[F[_]] = dom.Attr
+
+object Attr {
+  extension [F[_]](attr: Attr[F]) {
+    def ownerElement(using F: Dom[F]): F[Element[F]] = F.delay(attr.ownerElement)
+    def value(using F: Dom[F]): Ref[F, String] =
+      new WrappedRef {
+        def unsafeGet() = attr.value
+        def unsafeSet(s: String) = attr.value = s
+      }
+
+    def name: String = attr.name
+
+    def prefix: String = attr.prefix
   }
 }
 
