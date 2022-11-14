@@ -22,9 +22,10 @@ import cats.syntax.all._
 import org.scalajs.dom.Blob
 import org.scalajs.dom.ReadableStream
 
-import scala.scalajs.js.typedarray.Uint8Array
 import org.scalajs.dom.Event
+import org.scalajs.dom.EventListenerOptions
 import org.scalajs.dom.EventTarget
+import scala.scalajs.js.typedarray.Uint8Array
 
 package object dom {
 
@@ -44,13 +45,18 @@ package object dom {
   ): Resource[F, ReadableStream[Uint8Array]] =
     stream.through(toReadableStream).compile.resource.lastOrError
 
-  def events[F[_]: Async, E <: Event](target: EventTarget, `type`: String): Stream[F, E] =
-    Stream.resource(EventTargetHelpers.listen(target, `type`)).flatten
+  def events[F[_]: Async, E <: Event](
+      target: EventTarget,
+      `type`: String,
+      options: EventListenerOptions
+  ): Stream[F, E] =
+    Stream.resource(EventTargetHelpers.listen(target, `type`, options)).flatten
 
   def eventsResource[F[_]: Async, E <: Event](
       target: EventTarget,
-      `type`: String
+      `type`: String,
+      options: EventListenerOptions
   ): Resource[F, Stream[F, E]] =
-    EventTargetHelpers.listen(target, `type`)
+    EventTargetHelpers.listen(target, `type`, options)
 
 }

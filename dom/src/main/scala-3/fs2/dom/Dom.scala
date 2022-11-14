@@ -24,6 +24,7 @@ import fs2.Stream
 import org.scalajs.dom
 import org.scalajs.dom.Attr
 import org.scalajs.dom.Event
+import org.scalajs.dom.EventListenerOptions
 
 opaque type Dom[F[_]] = Async[F]
 object Dom {

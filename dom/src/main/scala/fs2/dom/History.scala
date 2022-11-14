@@ -20,8 +20,8 @@ import cats.data.OptionT
 import cats.effect.kernel.Async
 import cats.effect.kernel.Ref
 import cats.syntax.all._
-import fs2.Stream
 import fs2.concurrent.Signal
+import fs2.Stream
 import org.scalajs.dom.EventListenerOptions
 import org.scalajs.dom.PopStateEvent
 import org.scalajs.dom.ScrollRestoration
@@ -52,7 +52,7 @@ object History {
 
       def state = new Signal[F, Option[S]] {
         def discrete =
-          Stream.resource(eventsResource[F, PopStateEvent](window, "popstate")).flatMap { events =>
+          Stream.resource(eventsResource[F, PopStateEvent](window, "popstate", new EventListenerOptions {})).flatMap { events =>
             Stream.eval(get) ++ events.evalMap(e => serializer.deserialize(e.state).map(Some(_)))
           }
 
