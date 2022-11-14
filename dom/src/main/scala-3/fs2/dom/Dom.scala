@@ -22,6 +22,7 @@ import cats.effect.kernel.Ref
 import cats.effect.kernel.Resource
 import fs2.Stream
 import org.scalajs.dom
+import org.scalajs.dom.Attr
 import org.scalajs.dom.Event
 
 opaque type Dom[F[_]] = Async[F]
@@ -170,10 +171,8 @@ object DOMList {
   extension [F[_], A <: Node[F]](domList: DOMList[F, A]) {
     def apply(index: Int)(using F: Dom[F]): F[A] = F.delay(domList(index))
     def length(using F: Dom[F]): F[Int] = F.delay(domList.length)
+    def toList: List[A] = dom.DOMList.domListAsSeq(domList).toList
   }
-
-  implicit def domListAsList[F[_], T](domList: DOMList[F, T]): List[T] =
-    dom.DOMList.domListAsSeq(domList).toList
 }
 
 opaque type NodeList[F[_], +A <: Node[F]] <: DOMList[F, A] = dom.NodeList[A]
@@ -185,6 +184,33 @@ object NodeList {
 }
 
 opaque type NamedNodeMap[F[_]] = dom.NamedNodeMap
+
+object NamedNodeMap {
+  extension [F[_]](nodeMap: NamedNodeMap[F]) {
+    def length(using F: Dom[F]): F[Int] = F.delay(nodeMap.length)
+
+    def removeNamedItemNS(namespaceURI: String, localName: String)(using F: Dom[F]): F[Attr] =
+      F.delay(nodeMap.removeNamedItemNS(namespaceURI, localName))
+
+    def item(index: Int)(using F: Dom[F]): F[Attr] = F.delay(nodeMap.item(index))
+
+    def apply(index: Int)(using F: Dom[F]): F[Attr] = F.delay(nodeMap(index))
+
+    def update(index: Int, v: Attr)(using F: Dom[F]): F[Unit] = F.delay(nodeMap.update(index, v))
+
+    def removeNamedItem(name: String)(using F: Dom[F]): F[Attr] =
+      F.delay(nodeMap.removeNamedItem(name))
+
+    def getNamedItem(name: String)(using F: Dom[F]): F[Attr] = F.delay(nodeMap.getNamedItem(name))
+
+    def setNamedItem(arg: Attr)(using F: Dom[F]): F[Attr] = F.delay(nodeMap.setNamedItem(arg))
+
+    def getNamedItemNS(namespaceURI: String, localName: String)(using F: Dom[F]): F[Attr] =
+      F.delay(nodeMap.getNamedItemNS(namespaceURI, localName))
+
+    def setNamedItemNS(arg: Attr)(using F: Dom[F]): F[Attr] = F.delay(arg)
+  }
+}
 
 opaque type Document[F[_]] <: Node[F] = dom.Document
 object Document {
