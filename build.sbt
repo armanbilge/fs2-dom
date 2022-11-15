@@ -1,4 +1,4 @@
-ThisBuild / tlBaseVersion := "0.0"
+ThisBuild / tlBaseVersion := "0.1"
 
 ThisBuild / organization := "com.armanbilge"
 ThisBuild / organizationName := "Arman Bilge"
@@ -6,7 +6,9 @@ ThisBuild / developers += tlGitHubDev("armanbilge", "Arman Bilge")
 ThisBuild / startYear := Some(2022)
 ThisBuild / tlSonatypeUseLegacyHost := false
 
-ThisBuild / crossScalaVersions := Seq("3.2.0", "2.13.10")
+val scala213 = "2.13.10"
+ThisBuild / crossScalaVersions := Seq("2.12.17", scala213, "3.2.1")
+ThisBuild / scalaVersion := scala213
 
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
 ThisBuild / tlJdkRelease := Some(8)
@@ -23,8 +25,9 @@ ThisBuild / githubWorkflowBuildPreamble +=
     cond = Some("matrix.project == 'rootNodeJS'")
   )
 
-val ceVersion = "3.4.0-RC2"
+val ceVersion = "3.4.0"
 val fs2Version = "3.3.0"
+val circeVersion = "0.14.3"
 val sjsDomVersion = "2.3.0"
 val munitCEVersion = "2.0.0-M3"
 val scalaCheckEffectVersion = "2.0.0-M2"
@@ -51,7 +54,8 @@ lazy val dom = project
     libraryDependencies ++= Seq(
       "org.typelevel" %%% "cats-effect" % ceVersion,
       "co.fs2" %%% "fs2-core" % fs2Version,
-      "org.scala-js" %%% "scalajs-dom" % sjsDomVersion
+      "org.scala-js" %%% "scalajs-dom" % sjsDomVersion,
+      "io.circe" %%% "circe-scalajs" % circeVersion
     )
   )
 
@@ -78,11 +82,19 @@ def configureTest(project: Project): Project =
       testOptions += Tests.Argument("+l")
     )
 
+def configureBrowserTest(project: Project): Project =
+  project.settings(
+    Compile / unmanagedSourceDirectories +=
+      (LocalRootProject / baseDirectory).value / "testsBrowser" / "src" / "main" / "scala",
+    Test / unmanagedSourceDirectories +=
+      (LocalRootProject / baseDirectory).value / "testsBrowser" / "src" / "test" / "scala"
+  )
+
 lazy val testsNodeJS = project
   .configure(configureTest)
 
 lazy val testsChrome = project
-  .configure(configureTest)
+  .configure(configureTest, configureBrowserTest)
   .settings(
     jsEnv := {
       val config = SeleniumJSEnv.Config()
@@ -93,7 +105,7 @@ lazy val testsChrome = project
   )
 
 lazy val testsFirefox = project
-  .configure(configureTest)
+  .configure(configureTest, configureBrowserTest)
   .settings(
     jsEnv := {
       val config = SeleniumJSEnv.Config()

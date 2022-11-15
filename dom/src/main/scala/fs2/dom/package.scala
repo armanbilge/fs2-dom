@@ -23,6 +23,8 @@ import org.scalajs.dom.Blob
 import org.scalajs.dom.ReadableStream
 
 import scala.scalajs.js.typedarray.Uint8Array
+import org.scalajs.dom.Event
+import org.scalajs.dom.EventTarget
 
 package object dom {
 
@@ -41,5 +43,14 @@ package object dom {
       stream: Stream[F, Byte]
   ): Resource[F, ReadableStream[Uint8Array]] =
     stream.through(toReadableStream).compile.resource.lastOrError
+
+  def events[F[_]: Async, E <: Event](target: EventTarget, `type`: String): Stream[F, E] =
+    Stream.resource(EventTargetHelpers.listen(target, `type`)).flatten
+
+  def eventsResource[F[_]: Async, E <: Event](
+      target: EventTarget,
+      `type`: String
+  ): Resource[F, Stream[F, E]] =
+    EventTargetHelpers.listen(target, `type`)
 
 }
