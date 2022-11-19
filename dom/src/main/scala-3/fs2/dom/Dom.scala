@@ -53,10 +53,10 @@ object Node {
       ()
     }
 
-    def addEventListener[T <: Event](`type`: String, options: EventListenerOptions)(using
+    def addEventListener[T <: Event](`type`: String)(using
         F: Dom[F]
     ): Resource[F, Stream[F, T]] =
-      EventTargetHelpers.listen(node, `type`, options)
+      EventTargetHelpers.listen(node, `type`)
 
     def attributes(using F: Dom[F]): F[NamedNodeMap[F]] =
       F.delay(node.attributes)

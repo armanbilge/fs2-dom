@@ -48,15 +48,13 @@ package object dom {
   def events[F[_]: Async, E <: Event](
       target: EventTarget,
       `type`: String,
-      options: EventListenerOptions
   ): Stream[F, E] =
-    Stream.resource(EventTargetHelpers.listen(target, `type`, options)).flatten
+    Stream.resource(EventTargetHelpers.listen(target, `type`)).flatten
 
   def eventsResource[F[_]: Async, E <: Event](
       target: EventTarget,
       `type`: String,
-      options: EventListenerOptions
   ): Resource[F, Stream[F, E]] =
-    EventTargetHelpers.listen(target, `type`, options)
+    EventTargetHelpers.listen(target, `type`)
 
 }

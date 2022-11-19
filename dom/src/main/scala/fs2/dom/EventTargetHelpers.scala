@@ -28,8 +28,8 @@ import org.scalajs.dom.EventTarget
 
 private[dom] object EventTargetHelpers {
 
-  def listen[F[_], E <: Event](target: EventTarget, `type`: String, options: EventListenerOptions)(
-      implicit F: Async[F]
+  def listen[F[_], E <: Event](target: EventTarget, `type`: String)(implicit
+      F: Async[F]
   ): Resource[F, Stream[F, E]] = {
     val setup = for {
       dispatcher <- Dispatcher.sequential[F]
@@ -39,9 +39,9 @@ private[dom] object EventTargetHelpers {
           F.delay {
             target.addEventListener[E](
               `type`,
-              (ev: E) => dispatcher.unsafeRunAndForget(ch.send(ev)), {
-                options.signal = abort
-                options
+              (ev: E) => dispatcher.unsafeRunAndForget(ch.send(ev)),
+              new EventListenerOptions {
+                signal = abort
               }
             )
           }
