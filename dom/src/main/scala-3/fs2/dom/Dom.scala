@@ -146,6 +146,8 @@ object Event {
   object AfterPrint extends Event("afterprint") {
     type Type = dom.Event
   }
+
+  //TODO iterate through https://www.w3schools.com/jsref/dom_obj_event.asp
 }
 
 opaque type DOMList[F[_], +A] = dom.DOMList[A]

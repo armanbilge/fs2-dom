@@ -22,13 +22,13 @@ import cats.effect.kernel.Resource
 import cats.effect.std.Dispatcher
 import cats.syntax.all._
 import fs2.concurrent.Channel
-import org.scalajs.dom.Event
+import org.scalajs.dom
 import org.scalajs.dom.EventListenerOptions
 import org.scalajs.dom.EventTarget
 
 private[dom] object EventTargetHelpers {
 
-  def listen[F[_], E <: Event](target: EventTarget, `type`: String)(implicit
+  def listen[F[_], E <: dom.Event](target: EventTarget, `type`: String)(implicit
       F: Async[F]
   ): Resource[F, Stream[F, E]] = {
     val setup = for {
