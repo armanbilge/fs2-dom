@@ -22,7 +22,7 @@ import cats.effect.kernel.Ref
 import cats.effect.kernel.Resource
 import fs2.Stream
 import org.scalajs.dom
-import org.scalajs.dom.Event
+import org.scalajs.dom
 import org.scalajs.dom.EventListenerOptions
 
 opaque type Dom[F[_]] = Async[F]
@@ -53,10 +53,10 @@ object Node {
       ()
     }
 
-    def addEventListener[T <: Event](`type`: String)(using
+    def addEventListener(event: Event)(using
         F: Dom[F]
-    ): Resource[F, Stream[F, T]] =
-      EventTargetHelpers.listen(node, `type`)
+    ): Resource[F, Stream[F, event.Type]] =
+      EventTargetHelpers.listen(node, event.name)
 
     def attributes(using F: Dom[F]): F[NamedNodeMap[F]] =
       F.delay(node.attributes)
@@ -131,6 +131,20 @@ object Node {
         def unsafeGet() = node.innerText
         def unsafeSet(s: String) = node.innerText = s
       }
+  }
+}
+
+sealed abstract class Event(private[dom] val name: String) {
+  type Type <: dom.Event
+}
+
+object Event {
+  object Abort extends Event("abort") {
+    type Type = dom.UIEvent
+  }
+
+  object AfterPrint extends Event("afterprint") {
+    type Type = dom.Event
   }
 }
 
