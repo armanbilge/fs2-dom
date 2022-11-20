@@ -152,13 +152,13 @@ object EventTarget {
 opaque type Window[F[_]] = dom.Window
 
 object Window {
-  //this is quite big...
+  // this is quite big...
 }
 
 opaque type UIEvent[F[_]] <: Event[F] = dom.UIEvent
 
 object UIEvent {
-  extension[F[_]](uiEvent: UIEvent[F]) {
+  extension [F[_]](uiEvent: UIEvent[F]) {
     def detail(using F: Dom[F]): F[Int] = F.delay(uiEvent.detail)
 
     def view(using F: Dom[F]): F[Window[F]] = F.delay(uiEvent.view)
