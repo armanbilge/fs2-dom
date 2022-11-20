@@ -53,10 +53,10 @@ object Node {
       ()
     }
 
-    def addEventListener(event: Event)(using
+    def addEventListener(eventType: EventType)(using
         F: Dom[F]
-    ): Resource[F, Stream[F, event.Type]] =
-      EventTargetHelpers.listen(node, event.name)
+    ): Resource[F, Stream[F, eventType.Type]] =
+      EventTargetHelpers.listen(node, eventType.name)
 
     def attributes(using F: Dom[F]): F[NamedNodeMap[F]] =
       F.delay(node.attributes)
@@ -134,20 +134,68 @@ object Node {
   }
 }
 
-sealed abstract class Event(private[dom] val name: String) {
+opaque type EventTarget[F[_]] = dom.EventTarget
+
+object EventTarget {
+  extension [F[_]](eventTarget: EventTarget[F]) {
+
+    def addEventListener(eventType: EventType)(using
+        F: Dom[F]
+    ): Resource[F, Stream[F, eventType.Type]] =
+      EventTargetHelpers.listen(eventTarget, eventType.name)
+
+    def dispatchEvent(evt: Event[F])(using F: Dom[F]): F[Boolean] =
+      F.delay(eventTarget.dispatchEvent(evt))
+  }
+}
+
+opaque type Event[F[_]] = dom.Event
+
+object Event {
+  extension [F[_]](event: Event[F]) {
+    def timeStamp(using F: Dom[F]): F[Double] = F.delay(event.timeStamp)
+
+    def defaultPrevented(using F: Dom[F]): F[Boolean] = F.delay(event.defaultPrevented)
+
+    def isTrusted(using F: Dom[F]): F[Boolean] = F.delay(event.isTrusted)
+
+    def currentTarget(using F: Dom[F]): F[EventTarget[F]] = F.delay(event.currentTarget)
+
+    def cancelBubble(using F: Dom[F]): F[Boolean] = F.delay(event.cancelBubble)
+
+    def target(using F: Dom[F]): F[EventTarget[F]] = F.delay(event.target)
+
+    def eventPhase(using F: Dom[F]): F[Int] = F.delay(event.eventPhase)
+
+    def cancelable(using F: Dom[F]): F[Boolean] = F.delay(event.cancelable)
+
+    def `type`(using F: Dom[F]): F[String] = F.delay(event.`type`)
+
+    def bubbles(using F: Dom[F]): F[Boolean] = F.delay(event.bubbles)
+
+    def stopPropagation(using F: Dom[F]): F[Unit] = F.delay(event.stopPropagation())
+
+    def stopImmediatePropagation(using F: Dom[F]): F[Unit] =
+      F.delay(event.stopImmediatePropagation())
+
+    def preventDefault(using F: Dom[F]): F[Unit] = F.delay(event.preventDefault())
+  }
+}
+
+sealed abstract class EventType(private[dom] val name: String) {
   type Type <: dom.Event
 }
 
-object Event {
-  object Abort extends Event("abort") {
+object EventType {
+  object Abort extends EventType("abort") {
     type Type = dom.UIEvent
   }
 
-  object AfterPrint extends Event("afterprint") {
+  object AfterPrint extends EventType("afterprint") {
     type Type = dom.Event
   }
 
-  //TODO iterate through https://www.w3schools.com/jsref/dom_obj_event.asp
+  // TODO iterate through https://www.w3schools.com/jsref/dom_obj_event.asp
 }
 
 opaque type DOMList[F[_], +A] = dom.DOMList[A]
