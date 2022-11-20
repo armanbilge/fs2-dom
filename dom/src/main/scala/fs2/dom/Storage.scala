@@ -17,10 +17,9 @@
 package fs2
 package dom
 
-import cats.effect.kernel.Async
 import cats.syntax.all._
+import cats.effect.kernel.Async
 import org.scalajs.dom
-import org.scalajs.dom.EventListenerOptions
 
 abstract class Storage[F[_]] private {
 
@@ -72,14 +71,12 @@ object Storage {
     new Storage[F] {
 
       def events =
-        fs2.dom
-          .events[F, dom.StorageEvent](dom.window, "storage")
-          .mapFilter { ev =>
-            if (ev.storageArea eq storage)
-              Some(Event.fromStorageEvent(ev))
-            else
-              None
-          }
+        fs2.dom.events[F, dom.StorageEvent](dom.window, "storage").mapFilter { ev =>
+          if (ev.storageArea eq storage)
+            Some(Event.fromStorageEvent(ev))
+          else
+            None
+        }
 
       def length = F.delay(storage.length)
 
