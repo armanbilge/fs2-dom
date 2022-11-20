@@ -19,7 +19,11 @@ package fs2.dom
 import cats.effect.IO
 import cats.effect.kernel.Async
 import cats.effect.kernel.Ref
+import cats.effect.kernel.Resource
+import fs2.Stream
 import org.scalajs.dom
+import org.scalajs.dom
+import org.scalajs.dom.EventListenerOptions
 
 opaque type Dom[F[_]] = Async[F]
 object Dom {
@@ -48,6 +52,233 @@ object Node {
       node.replaceChild(newChild, oldChild)
       ()
     }
+
+    def addEventListener(eventType: EventType)(using
+        F: Dom[F]
+    ): Resource[F, Stream[F, eventType.Type[F]]] =
+      EventTargetHelpers.listen(node, eventType.name)
+
+    def attributes(using F: Dom[F]): F[NamedNodeMap[F]] =
+      F.delay(node.attributes)
+
+    def nodeType: Int = node.nodeType
+
+    def previousSibling(using F: Dom[F]): F[Node[F]] =
+      F.delay(node.previousSibling)
+
+    def localName(using F: Dom[F]): F[String] = F.delay(node.localName)
+
+    def namespaceURI(using F: Dom[F]): F[Option[String]] = F.delay(Option(node.namespaceURI))
+
+    def textContent(using F: Dom[F]): Ref[F, String] =
+      new WrappedRef {
+        def unsafeGet() = node.textContent
+        def unsafeSet(s: String) = node.textContent = s
+      }
+
+    def parentNode(using F: Dom[F]): F[Node[F]] = F.delay(node.parentNode)
+
+    def nextSibling(using F: Dom[F]): F[Option[Node[F]]] = F.delay(Option(node.nextSibling))
+
+    def nodeValue(using F: Dom[F]): Ref[F, String] =
+      new WrappedRef {
+        def unsafeGet() = node.nodeValue
+        def unsafeSet(s: String) = node.nodeValue = s
+      }
+
+    def lastChild(using F: Dom[F]): F[Option[Node[F]]] = F.delay(Option(node.lastChild))
+
+    def childNodes(using F: Dom[F]): F[NodeList[F, Node[F]]] = F.delay(node.childNodes)
+
+    def nodeName: Option[String] = Option(node.nodeName)
+
+    def ownerDocument(using F: Dom[F]): F[Option[Document[F]]] = F.delay(Option(node.ownerDocument))
+
+    def lookupPrefix(namespaceURI: String)(using F: Dom[F]): F[Option[String]] =
+      F.delay(Option(node.lookupPrefix(namespaceURI)))
+
+    def isDefaultNamespace(namespaceURI: String)(using F: Dom[F]): F[Boolean] =
+      F.delay(node.isDefaultNamespace(namespaceURI))
+
+    def compareDocumentPosition(other: Node[F])(using F: Dom[F]): F[Int] =
+      F.delay(node.compareDocumentPosition(other))
+
+    def normalize(using F: Dom[F]): F[Unit] = F.delay(node.normalize())
+
+    def isSameNode(other: Node[F])(using F: Dom[F]): F[Boolean] = F.delay(node.isSameNode(other))
+
+    def contains(otherNode: Node[F])(using F: Dom[F]): F[Boolean] =
+      F.delay(node.contains(otherNode))
+
+    def hasAttributes(using F: Dom[F]): F[Boolean] = F.delay(node.hasAttributes())
+
+    def lookupNamespaceURI(prefix: String)(using F: Dom[F]): F[Option[String]] =
+      F.delay(Option(node.lookupNamespaceURI(prefix)))
+
+    def cloneNode(deep: Boolean)(using F: Dom[F]): F[Node[F]] = F.delay(node.cloneNode(deep))
+
+    def hasChildNodes(using F: Dom[F]): F[Boolean] = F.delay(node.hasChildNodes())
+
+    def insertBefore(newChild: Node[F], refChild: Node[F])(using F: Dom[F]): F[Node[F]] =
+      F.delay(node.insertBefore(newChild, refChild))
+
+    def baseURI(using F: Dom[F]): F[String] = F.delay(node.baseURI)
+
+    def isConnected(using F: Dom[F]): F[Boolean] = F.delay(node.isConnected)
+
+    def innerText(using F: Dom[F]): Ref[F, String] =
+      new WrappedRef {
+        def unsafeGet() = node.innerText
+        def unsafeSet(s: String) = node.innerText = s
+      }
+  }
+}
+
+opaque type EventTarget[F[_]] = dom.EventTarget
+
+object EventTarget {
+  extension [F[_]](eventTarget: EventTarget[F]) {
+
+    def addEventListener(eventType: EventType)(using
+        F: Dom[F]
+    ): Resource[F, Stream[F, eventType.Type[F]]] =
+      EventTargetHelpers.listen(eventTarget, eventType.name)
+
+    def dispatchEvent(evt: Event[F])(using F: Dom[F]): F[Boolean] =
+      F.delay(eventTarget.dispatchEvent(evt))
+  }
+}
+
+opaque type Window[F[_]] = dom.Window
+
+object Window {
+  // this is quite big...
+}
+
+opaque type UIEvent[F[_]] <: Event[F] = dom.UIEvent
+
+object UIEvent {
+  extension [F[_]](uiEvent: UIEvent[F]) {
+    def detail(using F: Dom[F]): F[Int] = F.delay(uiEvent.detail)
+
+    def view(using F: Dom[F]): F[Window[F]] = F.delay(uiEvent.view)
+  }
+}
+
+opaque type Event[F[_]] = dom.Event
+
+object Event {
+  extension [F[_]](event: Event[F]) {
+    def timeStamp(using F: Dom[F]): F[Double] = F.delay(event.timeStamp)
+
+    def defaultPrevented(using F: Dom[F]): F[Boolean] = F.delay(event.defaultPrevented)
+
+    def isTrusted(using F: Dom[F]): F[Boolean] = F.delay(event.isTrusted)
+
+    def currentTarget(using F: Dom[F]): F[EventTarget[F]] = F.delay(event.currentTarget)
+
+    def cancelBubble(using F: Dom[F]): F[Boolean] = F.delay(event.cancelBubble)
+
+    def target(using F: Dom[F]): F[EventTarget[F]] = F.delay(event.target)
+
+    def eventPhase(using F: Dom[F]): F[Int] = F.delay(event.eventPhase)
+
+    def cancelable(using F: Dom[F]): F[Boolean] = F.delay(event.cancelable)
+
+    def `type`(using F: Dom[F]): F[String] = F.delay(event.`type`)
+
+    def bubbles(using F: Dom[F]): F[Boolean] = F.delay(event.bubbles)
+
+    def stopPropagation(using F: Dom[F]): F[Unit] = F.delay(event.stopPropagation())
+
+    def stopImmediatePropagation(using F: Dom[F]): F[Unit] =
+      F.delay(event.stopImmediatePropagation())
+
+    def preventDefault(using F: Dom[F]): F[Unit] = F.delay(event.preventDefault())
+  }
+}
+
+sealed abstract class EventType(private[dom] val name: String) {
+  type Type[F[_]] <: Event[F]
+}
+
+object EventType {
+  object Abort extends EventType("abort") {
+    type Type[F[_]] = UIEvent[F]
+  }
+
+  object AfterPrint extends EventType("afterprint") {
+    type Type[F[_]] = Event[F]
+  }
+
+  // TODO iterate through https://www.w3schools.com/jsref/dom_obj_event.asp
+}
+
+opaque type DOMList[F[_], +A] = dom.DOMList[A]
+
+object DOMList {
+  extension [F[_], A <: Node[F]](domList: DOMList[F, A]) {
+    def apply(index: Int)(using F: Dom[F]): F[A] = F.delay(domList(index))
+    def length(using F: Dom[F]): F[Int] = F.delay(domList.length)
+    def toList: List[A] = dom.DOMList.domListAsSeq(domList).toList
+  }
+}
+
+opaque type NodeList[F[_], +A <: Node[F]] <: DOMList[F, A] = dom.NodeList[A]
+
+object NodeList {
+  extension [F[_], A <: Node[F]](nodeList: NodeList[F, A]) {
+    def item(index: Int)(using F: Dom[F]): F[A] = F.delay(nodeList.item(index))
+  }
+}
+
+opaque type NamedNodeMap[F[_]] = dom.NamedNodeMap
+
+object NamedNodeMap {
+  extension [F[_]](nodeMap: NamedNodeMap[F]) {
+    def length(using F: Dom[F]): F[Int] = F.delay(nodeMap.length)
+
+    def removeNamedItemNS(namespaceURI: String, localName: String)(using F: Dom[F]): F[Attr[F]] =
+      F.delay(nodeMap.removeNamedItemNS(namespaceURI, localName))
+
+    def item(index: Int)(using F: Dom[F]): F[Attr[F]] = F.delay(nodeMap.item(index))
+
+    def apply(index: Int)(using F: Dom[F]): F[Attr[F]] = F.delay(nodeMap(index))
+
+    def update(index: Int, v: Attr[F])(using F: Dom[F]): F[Unit] = F.delay(nodeMap.update(index, v))
+
+    def removeNamedItem(name: String)(using F: Dom[F]): F[Attr[F]] =
+      F.delay(nodeMap.removeNamedItem(name))
+
+    def getNamedItem(name: String)(using F: Dom[F]): F[Option[Attr[F]]] =
+      F.delay(Option(nodeMap.getNamedItem(name)))
+
+    def setNamedItem(arg: Attr[F])(using F: Dom[F]): F[Attr[F]] = F.delay(nodeMap.setNamedItem(arg))
+
+    def getNamedItemNS(namespaceURI: String, localName: String)(using
+        F: Dom[F]
+    ): F[Option[Attr[F]]] =
+      F.delay(Option(nodeMap.getNamedItemNS(namespaceURI, localName)))
+
+    def setNamedItemNS(arg: Attr[F])(using F: Dom[F]): F[Attr[F]] =
+      F.delay(nodeMap.setNamedItemNS(arg))
+  }
+}
+
+opaque type Attr[F[_]] = dom.Attr
+
+object Attr {
+  extension [F[_]](attr: Attr[F]) {
+    def ownerElement(using F: Dom[F]): F[Element[F]] = F.delay(attr.ownerElement)
+    def value(using F: Dom[F]): Ref[F, String] =
+      new WrappedRef {
+        def unsafeGet() = attr.value
+        def unsafeSet(s: String) = attr.value = s
+      }
+
+    def name: String = attr.name
+
+    def prefix: String = attr.prefix
   }
 }
 
