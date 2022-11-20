@@ -55,7 +55,7 @@ object Node {
 
     def addEventListener(eventType: EventType)(using
         F: Dom[F]
-    ): Resource[F, Stream[F, eventType.Type]] =
+    ): Resource[F, Stream[F, eventType.Type[F]]] =
       EventTargetHelpers.listen(node, eventType.name)
 
     def attributes(using F: Dom[F]): F[NamedNodeMap[F]] =
@@ -141,11 +141,27 @@ object EventTarget {
 
     def addEventListener(eventType: EventType)(using
         F: Dom[F]
-    ): Resource[F, Stream[F, eventType.Type]] =
+    ): Resource[F, Stream[F, eventType.Type[F]]] =
       EventTargetHelpers.listen(eventTarget, eventType.name)
 
     def dispatchEvent(evt: Event[F])(using F: Dom[F]): F[Boolean] =
       F.delay(eventTarget.dispatchEvent(evt))
+  }
+}
+
+opaque type Window[F[_]] = dom.Window
+
+object Window {
+  //this is quite big...
+}
+
+opaque type UIEvent[F[_]] <: Event[F] = dom.UIEvent
+
+object UIEvent {
+  extension[F[_]](uiEvent: UIEvent[F]) {
+    def detail(using F: Dom[F]): F[Int] = F.delay(uiEvent.detail)
+
+    def view(using F: Dom[F]): F[Window[F]] = F.delay(uiEvent.view)
   }
 }
 
@@ -183,16 +199,16 @@ object Event {
 }
 
 sealed abstract class EventType(private[dom] val name: String) {
-  type Type <: dom.Event
+  type Type[F[_]] <: Event[F]
 }
 
 object EventType {
   object Abort extends EventType("abort") {
-    type Type = dom.UIEvent
+    type Type[F[_]] = UIEvent[F]
   }
 
   object AfterPrint extends EventType("afterprint") {
-    type Type = dom.Event
+    type Type[F[_]] = Event[F]
   }
 
   // TODO iterate through https://www.w3schools.com/jsref/dom_obj_event.asp
