@@ -52,9 +52,9 @@ object History {
 
       def state = new Signal[F, Option[S]] {
         def discrete =
-          Stream.resource(eventsResource[F, PopStateEvent](window, "popstate")).flatMap { events =>
-            Stream.eval(get) ++ events.evalMap(e => serializer.deserialize(e.state).map(Some(_)))
-          }
+          Stream.eval(get) ++
+            events[F, PopStateEvent](window, "popstate")
+              .evalMap(e => serializer.deserialize(e.state).map(Some(_)))
 
         def get = OptionT(F.delay(Option(window.history.state)))
           .semiflatMap(serializer.deserialize(_))

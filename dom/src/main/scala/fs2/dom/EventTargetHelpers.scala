@@ -18,38 +18,28 @@ package fs2
 package dom
 
 import cats.effect.kernel.Async
-import cats.effect.kernel.Resource
-import cats.effect.std.Dispatcher
-import cats.syntax.all._
-import fs2.concurrent.Channel
-import org.scalajs.dom.Event
-import org.scalajs.dom.EventListenerOptions
-import org.scalajs.dom.EventTarget
+import org.scalajs.dom
 
 private[dom] object EventTargetHelpers {
 
-  def listen[F[_], E <: Event](target: EventTarget, `type`: String)(implicit
+  def listen[F[_], E <: dom.Event](target: dom.EventTarget, `type`: String)(implicit
       F: Async[F]
-  ): Resource[F, Stream[F, E]] = {
-    val setup = for {
-      dispatcher <- Dispatcher.sequential[F]
-      abort <- AbortController[F]
-      ch <- Resource.eval {
-        Channel.unbounded[F, E].flatTap { ch =>
-          F.delay {
-            target.addEventListener[E](
-              `type`,
-              (ev: E) => dispatcher.unsafeRunAndForget(ch.send(ev)),
-              new EventListenerOptions {
-                signal = abort
-              }
-            )
-          }
+  ): Stream[F, E] =
+    Stream.repeatEval {
+      F.async[E] { cb =>
+        F.delay {
+          val ctrl = new dom.AbortController
+          target.addEventListener[E](
+            `type`,
+            e => cb(Right(e)),
+            new dom.EventListenerOptions {
+              once = true
+              signal = ctrl.signal
+            }
+          )
+          Some(F.delay(ctrl.abort()))
         }
       }
-    } yield ch
-
-    setup.map(_.stream)
-  }
+    }
 
 }
