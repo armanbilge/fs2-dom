@@ -31,7 +31,7 @@ private[dom] object EventTargetHelpers {
           val ctrl = new dom.AbortController
           target.addEventListener[E](
             `type`,
-            e => cb(Right(e)),
+            (e: E) => cb(Right(e)),
             new dom.EventListenerOptions {
               once = true
               signal = ctrl.signal
