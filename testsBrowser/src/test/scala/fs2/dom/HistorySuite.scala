@@ -21,6 +21,7 @@ import fs2.concurrent.Channel
 import munit.CatsEffectSuite
 
 import scala.concurrent.duration._
+import scala.scalajs.concurrent.QueueExecutionContext
 
 class HistorySuite extends CatsEffectSuite {
 
@@ -44,7 +45,7 @@ class HistorySuite extends CatsEffectSuite {
           _ <- ch.stream.take(2).compile.toList.assertEquals(List(1, 3))
         } yield ()
       }
-    }
+    }.evalOn(QueueExecutionContext.promises())
   }
 
 }
