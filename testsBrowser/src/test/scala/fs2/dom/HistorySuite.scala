@@ -39,6 +39,7 @@ class HistorySuite extends CatsEffectSuite {
           _ <- history.state.get.assertEquals(Some(3))
           _ <- history.back
           _ <- history.state.get.assertEquals(Some(1))
+          _ <- IO.sleep(1.second) // before the next UI
           _ <- history.forward
           _ <- history.state.get.assertEquals(Some(3))
           _ <- ch.stream.take(2).compile.toList.assertEquals(List(1, 3))
