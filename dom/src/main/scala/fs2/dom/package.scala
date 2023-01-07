@@ -45,12 +45,12 @@ package object dom {
     stream.through(toReadableStream).compile.resource.lastOrError
 
   def events[F[_]: Async, E <: Event](target: EventTarget, `type`: String): Stream[F, E] =
-    Stream.resource(EventTargetHelpers.listen(target, `type`)).flatten
+    EventTargetHelpers.listen(target, `type`)
 
+  @deprecated("Use events", "0.1.1")
   def eventsResource[F[_]: Async, E <: Event](
       target: EventTarget,
       `type`: String
-  ): Resource[F, Stream[F, E]] =
-    EventTargetHelpers.listen(target, `type`)
+  ): Resource[F, Stream[F, E]] = Resource.pure(events(target, `type`))
 
 }

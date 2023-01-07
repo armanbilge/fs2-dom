@@ -19,6 +19,7 @@ package fs2.dom
 import cats.data.OptionT
 import cats.effect.kernel.Async
 import cats.effect.kernel.Ref
+import cats.effect.std.Queue
 import cats.syntax.all._
 import fs2.Stream
 import fs2.concurrent.Signal
@@ -51,10 +52,15 @@ object History {
     new History[F, S] {
 
       def state = new Signal[F, Option[S]] {
-        def discrete =
-          Stream.resource(eventsResource[F, PopStateEvent](window, "popstate")).flatMap { events =>
-            Stream.eval(get) ++ events.evalMap(e => serializer.deserialize(e.state).map(Some(_)))
-          }
+        def discrete = Stream.eval(Queue.circularBuffer[F, PopStateEvent](1)).flatMap { queue =>
+          val head = Stream.eval(get)
+          val tail =
+            Stream.repeatEval(queue.take).evalMap(e => serializer.deserialize(e.state).map(Some(_)))
+
+          val listener = events[F, PopStateEvent](window, "popstate").foreach(queue.offer(_))
+
+          (head ++ tail).concurrently(listener)
+        }
 
         def get = OptionT(F.delay(Option(window.history.state)))
           .semiflatMap(serializer.deserialize(_))
