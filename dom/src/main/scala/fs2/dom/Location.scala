@@ -50,10 +50,7 @@ abstract class Location[F[_]] private {
 
 object Location {
 
-  def apply[F[_]: Sync]: Location[F] =
-    apply(dom.window.location)
-
-  private def apply[F[_]](location: dom.Location)(implicit F: Sync[F]): Location[F] =
+  private[dom] def apply[F[_]](location: dom.Location)(implicit F: Sync[F]): Location[F] =
     new Location[F] {
 
       def href = new WrappedRef[F, String] {

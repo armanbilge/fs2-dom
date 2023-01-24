@@ -19,22 +19,26 @@ package fs2.dom
 import cats.effect.kernel.Async
 import org.scalajs.dom
 
-abstract class Clipboard[F[_]] private {
+import scala.scalajs.js
 
-  def readText: F[String]
+abstract class Navigator[F[_]] private {
 
-  def writeText(text: String): F[Unit]
+  def clipboard: Clipboard[F]
+
+  def locks: LockManager[F]
 
 }
 
-object Clipboard {
+object Navigator {
 
-  private[dom] def apply[F[_]](clipboard: dom.Clipboard)(implicit F: Async[F]): Clipboard[F] =
-    new Clipboard[F] {
+  private[dom] def apply[F[_]](navigator: dom.Navigator)(implicit F: Async[F]): Navigator[F] =
+    new Navigator[F] {
 
-      def readText = F.fromPromise(F.delay(clipboard.readText()))
+      def clipboard = Clipboard(navigator.clipboard)
 
-      def writeText(text: String) = F.fromPromise(F.delay(clipboard.writeText(text)))
+      def locks = LockManager(
+        navigator.asInstanceOf[js.Dynamic].locks.asInstanceOf[facade.LockManager]
+      )
 
     }
 

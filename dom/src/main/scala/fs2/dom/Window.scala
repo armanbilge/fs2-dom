@@ -19,22 +19,33 @@ package fs2.dom
 import cats.effect.kernel.Async
 import org.scalajs.dom
 
-abstract class Clipboard[F[_]] private {
+abstract class Window[F[_]] private {
 
-  def readText: F[String]
+  def localStorage: Storage[F]
 
-  def writeText(text: String): F[Unit]
+  def location: Location[F]
+
+  def navigator: Navigator[F]
+
+  def sessionStorage: Storage[F]
 
 }
 
-object Clipboard {
+object Window {
 
-  private[dom] def apply[F[_]](clipboard: dom.Clipboard)(implicit F: Async[F]): Clipboard[F] =
-    new Clipboard[F] {
+  def apply[F[_]](implicit F: Async[F]): Window[F] =
+    apply(dom.window)
 
-      def readText = F.fromPromise(F.delay(clipboard.readText()))
+  def apply[F[_]](window: dom.Window)(implicit F: Async[F]): Window[F] =
+    new Window[F] {
 
-      def writeText(text: String) = F.fromPromise(F.delay(clipboard.writeText(text)))
+      def localStorage = Storage(window.localStorage)
+
+      def location = Location(window.location)
+
+      def navigator = Navigator(window.navigator)
+
+      def sessionStorage = Storage(window.sessionStorage)
 
     }
 

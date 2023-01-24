@@ -41,10 +41,6 @@ abstract class Storage[F[_]] private {
 
 object Storage {
 
-  def local[F[_]: Async]: Storage[F] = apply(dom.window.localStorage)
-
-  def session[F[_]: Async]: Storage[F] = apply(dom.window.sessionStorage)
-
   sealed abstract class Event {
     def url: String
   }
