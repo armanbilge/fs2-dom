@@ -23,11 +23,11 @@ import cats.syntax.all._
 
 import scala.scalajs.js
 
-private[dom] abstract class WrappedRef[F[_], A](implicit F: Sync[F]) extends Ref[F, A] {
-
-  def unsafeGet(): A
-
-  def unsafeSet(a: A): Unit
+private final class WrappedRef[F[_], A](
+    unsafeGet: js.Function0[A],
+    unsafeSet: js.Function1[A, Unit]
+)(implicit F: Sync[F])
+    extends Ref[F, A] {
 
   def get: F[A] = F.delay(unsafeGet())
 

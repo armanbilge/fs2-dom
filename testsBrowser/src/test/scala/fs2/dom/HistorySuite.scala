@@ -19,13 +19,15 @@ package fs2.dom
 import cats.effect.IO
 import fs2.concurrent.Channel
 import munit.CatsEffectSuite
+import org.scalajs.dom.ScrollRestoration
 
 import scala.concurrent.duration._
 
 class HistorySuite extends CatsEffectSuite {
 
+  val history = History[IO, Int]
+
   test("history") {
-    val history = History[IO, Int]
     Channel.unbounded[IO, Int].flatMap { ch =>
       history.state.discrete.unNone.through(ch.sendAll).compile.drain.background.surround {
         for {
@@ -46,6 +48,10 @@ class HistorySuite extends CatsEffectSuite {
         } yield ()
       }
     }
+  }
+
+  test("scroll restoration") {
+    history.scrollRestoration.getAndUpdate(identity(_)).assertEquals(ScrollRestoration.auto)
   }
 
 }
