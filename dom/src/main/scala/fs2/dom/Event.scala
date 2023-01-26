@@ -47,9 +47,18 @@ abstract class Event[F[_]] private[dom] {
 
 }
 
-object Event {}
+object Event {
+  def apply[F[_]](event: dom.Event)(implicit F: Sync[F]): Event[F] =
+    new WrappedEvent(event)
+}
 
-private[dom] class WrappedEvent[F[_]](event: dom.Event)(implicit F: Sync[F]) extends Event[F] {
+private final class WrappedEvent[F[_]](val event: dom.Event)(implicit val F: Sync[F])
+    extends EventImpl[F]
+
+private trait EventImpl[F[_]] extends Event[F] {
+  def event: dom.Event
+  implicit def F: Sync[F]
+
   def bubbles = event.bubbles
   def cancelable = event.cancelable
   // def composed = event.composed
