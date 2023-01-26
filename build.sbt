@@ -7,7 +7,7 @@ ThisBuild / startYear := Some(2022)
 ThisBuild / tlSonatypeUseLegacyHost := false
 
 val scala213 = "2.13.10"
-ThisBuild / crossScalaVersions := Seq("2.12.17", scala213, "3.2.1")
+ThisBuild / crossScalaVersions := Seq(scala213, "3.2.1")
 ThisBuild / scalaVersion := scala213
 
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
@@ -25,8 +25,8 @@ ThisBuild / githubWorkflowBuildPreamble +=
     cond = Some("matrix.project == 'rootNodeJS'")
   )
 
-val ceVersion = "3.4.0-RC2"
-val fs2Version = "3.3.0"
+val ceVersion = "3.4.5"
+val fs2Version = "3.5.0"
 val circeVersion = "0.14.3"
 val sjsDomVersion = "2.3.0"
 val munitCEVersion = "2.0.0-M3"

@@ -183,3 +183,4 @@ opaque type HtmlTitleElement[F[_]] <: HtmlElement[F] = dom.HTMLTitleElement
 opaque type HtmlTrackElement[F[_]] <: HtmlElement[F] = dom.HTMLTrackElement
 opaque type HtmlUListElement[F[_]] <: HtmlElement[F] = dom.HTMLUListElement
 opaque type HtmlVideoElement[F[_]] <: HtmlElement[F] = dom.HTMLVideoElement
+opaque type HtmlDialogElement[F[_]] <: HtmlElement[F] = dom.HTMLDialogElement
