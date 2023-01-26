@@ -56,45 +56,21 @@ object Location {
   private def apply[F[_]](location: dom.Location)(implicit F: Sync[F]): Location[F] =
     new Location[F] {
 
-      def href = new WrappedRef[F, String] {
-        def unsafeGet() = location.href
-        def unsafeSet(s: String): Unit = location.href = s
-      }
+      def href = new PropRef(location, "href")
 
-      def protocol = new WrappedRef[F, String] {
-        def unsafeGet() = location.protocol
-        def unsafeSet(s: String): Unit = location.protocol = s
-      }
+      def protocol = new PropRef(location, "protocol")
 
-      def host = new WrappedRef[F, String] {
-        def unsafeGet() = location.host
-        def unsafeSet(s: String): Unit = location.host = s
-      }
+      def host = new PropRef(location, "host")
 
-      def hostname = new WrappedRef[F, String] {
-        def unsafeGet() = location.hostname
-        def unsafeSet(s: String): Unit = location.hostname = s
-      }
+      def hostname = new PropRef(location, "hostname")
 
-      def port = new WrappedRef[F, String] {
-        def unsafeGet() = location.port
-        def unsafeSet(s: String): Unit = location.port = s
-      }
+      def port = new PropRef(location, "port")
 
-      def pathname = new WrappedRef[F, String] {
-        def unsafeGet() = location.pathname
-        def unsafeSet(s: String): Unit = location.pathname = s
-      }
+      def pathname = new PropRef(location, "pathname")
 
-      def search = new WrappedRef[F, String] {
-        def unsafeGet() = location.search
-        def unsafeSet(s: String): Unit = location.search = s
-      }
+      def search = new PropRef(location, "search")
 
-      def hash = new WrappedRef[F, String] {
-        def unsafeGet() = location.hash
-        def unsafeSet(s: String): Unit = location.hash = s
-      }
+      def hash = new PropRef(location, "hash")
 
       def origin = F.delay(location.origin.asInstanceOf[String])
 

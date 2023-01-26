@@ -77,11 +77,7 @@ opaque type HtmlBodyElement[F[_]] <: HtmlElement[F] = dom.HTMLBodyElement
 opaque type HtmlButtonElement[F[_]] <: HtmlElement[F] = dom.HTMLButtonElement
 object HtmlButtonElement {
   extension [F[_]](button: HtmlButtonElement[F]) {
-    def value(using Dom[F]): Ref[F, String] =
-      new WrappedRef[F, String] {
-        def unsafeGet() = button.value
-        def unsafeSet(s: String) = button.value = s
-      }
+    def value(using Dom[F]): Ref[F, String] = new PropRef(button, "value")
   }
 }
 
@@ -103,17 +99,9 @@ opaque type HtmlImageElement[F[_]] <: HtmlElement[F] = dom.HTMLImageElement
 opaque type HtmlInputElement[F[_]] <: HtmlElement[F] = dom.HTMLInputElement
 object HtmlInputElement {
   extension [F[_]](input: HtmlInputElement[F]) {
-    def checked(using Dom[F]): Ref[F, Boolean] =
-      new WrappedRef[F, Boolean] {
-        def unsafeGet() = input.checked
-        def unsafeSet(b: Boolean) = input.checked = b
-      }
+    def checked(using Dom[F]): Ref[F, Boolean] = new PropRef(input, "checked")
 
-    def value(using Dom[F]): Ref[F, String] =
-      new WrappedRef[F, String] {
-        def unsafeGet() = input.value
-        def unsafeSet(s: String) = input.value = s
-      }
+    def value(using Dom[F]): Ref[F, String] = new PropRef(input, "value")
   }
 }
 
@@ -132,11 +120,7 @@ opaque type HtmlOptGroupElement[F[_]] <: HtmlElement[F] = dom.HTMLOptGroupElemen
 opaque type HtmlOptionElement[F[_]] <: HtmlElement[F] = dom.HTMLOptionElement
 object HtmlOptionElement {
   extension [F[_]](option: HtmlOptionElement[F]) {
-    def value(using Dom[F]): Ref[F, String] =
-      new WrappedRef[F, String] {
-        def unsafeGet() = option.value
-        def unsafeSet(s: String) = option.value = s
-      }
+    def value(using Dom[F]): Ref[F, String] = new PropRef(option, "value")
   }
 }
 
@@ -150,11 +134,7 @@ opaque type HtmlScriptElement[F[_]] <: HtmlElement[F] = dom.HTMLScriptElement
 opaque type HtmlSelectElement[F[_]] <: HtmlElement[F] = dom.HTMLSelectElement
 object HtmlSelectElement {
   extension [F[_]](select: HtmlSelectElement[F]) {
-    def value(using Dom[F]): Ref[F, String] =
-      new WrappedRef[F, String] {
-        def unsafeGet() = select.value
-        def unsafeSet(s: String) = select.value = s
-      }
+    def value(using Dom[F]): Ref[F, String] = new PropRef(select, "value")
   }
 }
 
@@ -171,11 +151,7 @@ opaque type HtmlTableSectionElement[F[_]] <: HtmlElement[F] = dom.HTMLTableSecti
 opaque type HtmlTextAreaElement[F[_]] <: HtmlElement[F] = dom.HTMLTextAreaElement
 object HtmlTextAreaElement {
   extension [F[_]](textArea: HtmlTextAreaElement[F]) {
-    def value(using Dom[F]): Ref[F, String] =
-      new WrappedRef[F, String] {
-        def unsafeGet() = textArea.value
-        def unsafeSet(s: String) = textArea.value = s
-      }
+    def value(using Dom[F]): Ref[F, String] = new PropRef(textArea, "value")
   }
 }
 
