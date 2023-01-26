@@ -31,7 +31,7 @@ abstract class Event[F[_]] private[dom] {
 
   def defaultPrevented: F[Boolean]
 
-  def eventPhase: F[Event.Phase]
+  def eventPhase: F[Int]
 
   def isTrusted: Boolean
 
@@ -47,31 +47,14 @@ abstract class Event[F[_]] private[dom] {
 
 }
 
-object Event {
-
-  sealed abstract class Phase
-  object Phase {
-    object None extends Phase
-    object Capturing extends Phase
-    object AtTarget extends Phase
-    object Bubbling extends Phase
-
-    private[dom] def fromInt(phase: Int): Phase = phase match {
-      case 0 => None
-      case 1 => Capturing
-      case 2 => AtTarget
-      case 3 => Bubbling
-    }
-  }
-
-}
+object Event {}
 
 private[dom] class WrappedEvent[F[_]](event: dom.Event)(implicit F: Sync[F]) extends Event[F] {
   def bubbles = event.bubbles
   def cancelable = event.cancelable
   // def composed = event.composed
   def defaultPrevented = F.delay(event.defaultPrevented)
-  def eventPhase = F.delay(Event.Phase.fromInt(event.eventPhase))
+  def eventPhase = F.delay(event.eventPhase)
   def isTrusted = event.isTrusted
   def timeStamp = F.delay(event.timeStamp.millis)
   def `type` = event.`type`
