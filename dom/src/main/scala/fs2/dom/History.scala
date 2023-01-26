@@ -75,11 +75,10 @@ object History {
         def continuous = Stream.repeatEval(get)
       }
 
-      def scrollRestoration = new WrappedRef[F, ScrollRestoration] {
-        def unsafeGet(): ScrollRestoration = window.history.scrollRestoration
-        def unsafeSet(sr: ScrollRestoration): Unit =
-          window.history.scrollRestoration = sr
-      }
+      def scrollRestoration = new WrappedRef(
+        () => window.history.scrollRestoration,
+        window.history.scrollRestoration = _
+      )
 
       def forward = asyncPopState(window.history.forward())
       def back = asyncPopState(window.history.back())
