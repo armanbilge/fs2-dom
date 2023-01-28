@@ -19,29 +19,32 @@ package fs2
 import cats.effect.kernel.Async
 import cats.effect.kernel.Resource
 import cats.syntax.all._
-import org.scalajs.dom
+import org.scalajs.dom.Blob
+import org.scalajs.dom.{Event => DomEvent}
+import org.scalajs.dom.EventTarget
+import org.scalajs.dom.ReadableStream
 
 import scala.scalajs.js.typedarray.Uint8Array
 
 package object dom {
 
-  def readBlob[F[_]](blob: F[dom.Blob])(implicit F: Async[F]): Stream[F, Byte] =
+  def readBlob[F[_]](blob: F[Blob])(implicit F: Async[F]): Stream[F, Byte] =
     readReadableStream(blob.flatMap(b => F.delay(b.stream())))
 
   def readReadableStream[F[_]: Async](
-      readableStream: F[dom.ReadableStream[Uint8Array]],
+      readableStream: F[ReadableStream[Uint8Array]],
       cancelAfterUse: Boolean = true
   ): Stream[F, Byte] = StreamConverters.readReadableStream(readableStream, cancelAfterUse)
 
-  def toReadableStream[F[_]: Async]: Pipe[F, Byte, dom.ReadableStream[Uint8Array]] =
+  def toReadableStream[F[_]: Async]: Pipe[F, Byte, ReadableStream[Uint8Array]] =
     StreamConverters.toReadableStream
 
   def toReadableStreamResource[F[_]: Async](
       stream: Stream[F, Byte]
-  ): Resource[F, dom.ReadableStream[Uint8Array]] =
+  ): Resource[F, ReadableStream[Uint8Array]] =
     stream.through(toReadableStream).compile.resource.lastOrError
 
-  def events[F[_]: Async, E <: dom.Event](target: dom.EventTarget, `type`: String): Stream[F, E] =
+  def events[F[_]: Async, E <: DomEvent](target: EventTarget, `type`: String): Stream[F, E] =
     EventTargetHelpers.listen(target, `type`)
 
 }
