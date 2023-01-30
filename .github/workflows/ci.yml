@@ -28,7 +28,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        scala: [2.13.10, 3.2.1]
+        scala: [2.13.10, 3.2.2]
         java: [temurin@17]
         project: [rootNodeJS, rootChrome, rootFirefox]
     runs-on: ${{ matrix.os }}
@@ -159,12 +159,12 @@ jobs:
           tar xf targets.tar
           rm targets.tar
 
-      - name: Download target directories (3.2.1, rootNodeJS)
+      - name: Download target directories (3.2.2, rootNodeJS)
         uses: actions/download-artifact@v3
         with:
-          name: target-${{ matrix.os }}-${{ matrix.java }}-3.2.1-rootNodeJS
+          name: target-${{ matrix.os }}-${{ matrix.java }}-3.2.2-rootNodeJS
 
-      - name: Inflate target directories (3.2.1, rootNodeJS)
+      - name: Inflate target directories (3.2.2, rootNodeJS)
         run: |
           tar xf targets.tar
           rm targets.tar
