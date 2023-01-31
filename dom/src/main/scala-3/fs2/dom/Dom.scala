@@ -78,10 +78,7 @@ opaque type HtmlButtonElement[F[_]] <: HtmlElement[F] = dom.HTMLButtonElement
 object HtmlButtonElement {
   extension [F[_]](button: HtmlButtonElement[F]) {
     def value(using Dom[F]): Ref[F, String] =
-      new WrappedRef[F, String] {
-        def unsafeGet() = button.value
-        def unsafeSet(s: String) = button.value = s
-      }
+      new WrappedRef(() => button.value, button.value = _)
   }
 }
 
@@ -104,16 +101,10 @@ opaque type HtmlInputElement[F[_]] <: HtmlElement[F] = dom.HTMLInputElement
 object HtmlInputElement {
   extension [F[_]](input: HtmlInputElement[F]) {
     def checked(using Dom[F]): Ref[F, Boolean] =
-      new WrappedRef[F, Boolean] {
-        def unsafeGet() = input.checked
-        def unsafeSet(b: Boolean) = input.checked = b
-      }
+      new WrappedRef(() => input.checked, input.checked = _)
 
     def value(using Dom[F]): Ref[F, String] =
-      new WrappedRef[F, String] {
-        def unsafeGet() = input.value
-        def unsafeSet(s: String) = input.value = s
-      }
+      new WrappedRef(() => input.value, input.value = _)
   }
 }
 
@@ -133,10 +124,7 @@ opaque type HtmlOptionElement[F[_]] <: HtmlElement[F] = dom.HTMLOptionElement
 object HtmlOptionElement {
   extension [F[_]](option: HtmlOptionElement[F]) {
     def value(using Dom[F]): Ref[F, String] =
-      new WrappedRef[F, String] {
-        def unsafeGet() = option.value
-        def unsafeSet(s: String) = option.value = s
-      }
+      new WrappedRef(() => option.value, option.value = _)
   }
 }
 
@@ -151,10 +139,7 @@ opaque type HtmlSelectElement[F[_]] <: HtmlElement[F] = dom.HTMLSelectElement
 object HtmlSelectElement {
   extension [F[_]](select: HtmlSelectElement[F]) {
     def value(using Dom[F]): Ref[F, String] =
-      new WrappedRef[F, String] {
-        def unsafeGet() = select.value
-        def unsafeSet(s: String) = select.value = s
-      }
+      new WrappedRef(() => select.value, select.value = _)
   }
 }
 
@@ -172,10 +157,7 @@ opaque type HtmlTextAreaElement[F[_]] <: HtmlElement[F] = dom.HTMLTextAreaElemen
 object HtmlTextAreaElement {
   extension [F[_]](textArea: HtmlTextAreaElement[F]) {
     def value(using Dom[F]): Ref[F, String] =
-      new WrappedRef[F, String] {
-        def unsafeGet() = textArea.value
-        def unsafeSet(s: String) = textArea.value = s
-      }
+      new WrappedRef(() => textArea.value, textArea.value = _)
   }
 }
 

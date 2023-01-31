@@ -23,8 +23,8 @@ import cats.effect.std.Queue
 import cats.syntax.all._
 import fs2.Stream
 import fs2.concurrent.Signal
+import org.scalajs.dom
 import org.scalajs.dom.EventListenerOptions
-import org.scalajs.dom.PopStateEvent
 import org.scalajs.dom.ScrollRestoration
 import org.scalajs.dom.window
 
@@ -52,12 +52,12 @@ object History {
     new History[F, S] {
 
       def state = new Signal[F, Option[S]] {
-        def discrete = Stream.eval(Queue.circularBuffer[F, PopStateEvent](1)).flatMap { queue =>
+        def discrete = Stream.eval(Queue.circularBuffer[F, dom.PopStateEvent](1)).flatMap { queue =>
           val head = Stream.eval(get)
           val tail =
             Stream.repeatEval(queue.take).evalMap(e => serializer.deserialize(e.state).map(Some(_)))
 
-          val listener = events[F, PopStateEvent](window, "popstate").foreach(queue.offer(_))
+          val listener = events[F, dom.PopStateEvent](window, "popstate").foreach(queue.offer(_))
 
           (head ++ tail).concurrently(listener)
         }
@@ -75,11 +75,10 @@ object History {
         def continuous = Stream.repeatEval(get)
       }
 
-      def scrollRestoration = new WrappedRef[F, ScrollRestoration] {
-        def unsafeGet(): ScrollRestoration = window.history.scrollRestoration
-        def unsafeSet(sr: ScrollRestoration): Unit =
-          window.history.scrollRestoration = sr
-      }
+      def scrollRestoration = new WrappedRef(
+        () => window.history.scrollRestoration,
+        window.history.scrollRestoration = _
+      )
 
       def forward = asyncPopState(window.history.forward())
       def back = asyncPopState(window.history.back())
@@ -97,7 +96,7 @@ object History {
         serializer.serialize(state).flatMap(s => F.delay(window.history.replaceState(s, "", url)))
 
       def asyncPopState(thunk: => Unit): F[Unit] = F.async_[Unit] { cb =>
-        window.addEventListener[PopStateEvent](
+        window.addEventListener[dom.PopStateEvent](
           "popstate",
           (_: Any) => cb(Either.unit),
           new EventListenerOptions {

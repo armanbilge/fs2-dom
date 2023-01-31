@@ -53,45 +53,21 @@ object Location {
   private[dom] def apply[F[_]](location: dom.Location)(implicit F: Sync[F]): Location[F] =
     new Location[F] {
 
-      def href = new WrappedRef[F, String] {
-        def unsafeGet() = location.href
-        def unsafeSet(s: String): Unit = location.href = s
-      }
+      def href = new WrappedRef(() => location.href, location.href = _)
 
-      def protocol = new WrappedRef[F, String] {
-        def unsafeGet() = location.protocol
-        def unsafeSet(s: String): Unit = location.protocol = s
-      }
+      def protocol = new WrappedRef(() => location.protocol, location.protocol = _)
 
-      def host = new WrappedRef[F, String] {
-        def unsafeGet() = location.host
-        def unsafeSet(s: String): Unit = location.host = s
-      }
+      def host = new WrappedRef(() => location.host, location.host = _)
 
-      def hostname = new WrappedRef[F, String] {
-        def unsafeGet() = location.hostname
-        def unsafeSet(s: String): Unit = location.hostname = s
-      }
+      def hostname = new WrappedRef(() => location.hostname, location.hostname = _)
 
-      def port = new WrappedRef[F, String] {
-        def unsafeGet() = location.port
-        def unsafeSet(s: String): Unit = location.port = s
-      }
+      def port = new WrappedRef(() => location.port, location.port = _)
 
-      def pathname = new WrappedRef[F, String] {
-        def unsafeGet() = location.pathname
-        def unsafeSet(s: String): Unit = location.pathname = s
-      }
+      def pathname = new WrappedRef(() => location.pathname, location.pathname = _)
 
-      def search = new WrappedRef[F, String] {
-        def unsafeGet() = location.search
-        def unsafeSet(s: String): Unit = location.search = s
-      }
+      def search = new WrappedRef(() => location.search, location.search = _)
 
-      def hash = new WrappedRef[F, String] {
-        def unsafeGet() = location.hash
-        def unsafeSet(s: String): Unit = location.hash = s
-      }
+      def hash = new WrappedRef(() => location.hash, location.hash = _)
 
       def origin = F.delay(location.origin.asInstanceOf[String])
 

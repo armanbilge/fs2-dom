@@ -20,11 +20,11 @@ import cats.effect.kernel.Async
 import cats.effect.kernel.Resource
 import cats.syntax.all._
 import org.scalajs.dom.Blob
+import org.scalajs.dom.{Event => DomEvent}
+import org.scalajs.dom.EventTarget
 import org.scalajs.dom.ReadableStream
 
 import scala.scalajs.js.typedarray.Uint8Array
-import org.scalajs.dom.Event
-import org.scalajs.dom.EventTarget
 
 package object dom {
 
@@ -44,13 +44,7 @@ package object dom {
   ): Resource[F, ReadableStream[Uint8Array]] =
     stream.through(toReadableStream).compile.resource.lastOrError
 
-  def events[F[_]: Async, E <: Event](target: EventTarget, `type`: String): Stream[F, E] =
+  def events[F[_]: Async, E <: DomEvent](target: EventTarget, `type`: String): Stream[F, E] =
     EventTargetHelpers.listen(target, `type`)
-
-  @deprecated("Use events", "0.1.1")
-  def eventsResource[F[_]: Async, E <: Event](
-      target: EventTarget,
-      `type`: String
-  ): Resource[F, Stream[F, E]] = Resource.pure(events(target, `type`))
 
 }
