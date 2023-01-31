@@ -17,6 +17,7 @@
 package fs2.dom
 
 import cats.effect.kernel.Async
+import fs2.Stream
 import org.scalajs.dom
 
 abstract class Window[F[_]] private {
@@ -28,6 +29,8 @@ abstract class Window[F[_]] private {
   def navigator: Navigator[F]
 
   def sessionStorage: Storage[F]
+
+  def storageEvents: Stream[F, StorageEvent[F]]
 
 }
 
@@ -46,6 +49,9 @@ object Window {
       def navigator = Navigator(window.navigator)
 
       def sessionStorage = Storage(window.sessionStorage)
+
+      def storageEvents: Stream[F, StorageEvent[F]] =
+        events[F, dom.StorageEvent](window, "storage").map(StorageEvent(_))
 
     }
 
