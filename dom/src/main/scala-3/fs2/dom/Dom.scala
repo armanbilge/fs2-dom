@@ -66,6 +66,8 @@ object Document {
   }
 }
 
+opaque type HtmlDocument[F[_]] <: Document[F] = dom.HTMLDocument
+
 opaque type Element[F[_]] <: Node[F] = dom.Element
 opaque type HtmlElement[F[_]] <: Element[F] = dom.HTMLElement
 opaque type HtmlAnchorElement[F[_]] <: HtmlElement[F] = dom.HTMLAnchorElement

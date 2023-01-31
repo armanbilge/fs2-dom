@@ -20,7 +20,7 @@ import cats.effect.kernel.Async
 import fs2.Stream
 import org.scalajs.dom
 
-abstract class Window[F[_]] private {
+abstract class Window[F[_]] private extends WindowCrossCompat[F] {
 
   def history[S](implicit serializer: Serializer[F, S]): History[F, S]
 
@@ -41,8 +41,10 @@ object Window {
   def apply[F[_]](implicit F: Async[F]): Window[F] =
     apply(dom.window)
 
-  def apply[F[_]](window: dom.Window)(implicit F: Async[F]): Window[F] =
-    new Window[F] {
+  private def apply[F[_]](_window: dom.Window)(implicit F: Async[F]): Window[F] =
+    new Window[F] with WindowImplCrossCompat[F] {
+
+      private[dom] def window = _window
 
       def history[S](implicit serializer: Serializer[F, S]) = History(window, window.history)
 
