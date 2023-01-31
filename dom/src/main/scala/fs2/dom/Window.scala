@@ -22,6 +22,8 @@ import org.scalajs.dom
 
 abstract class Window[F[_]] private {
 
+  def history[S](implicit serializer: Serializer[F, S]): History[F, S]
+
   def localStorage: Storage[F]
 
   def location: Location[F]
@@ -41,6 +43,8 @@ object Window {
 
   def apply[F[_]](window: dom.Window)(implicit F: Async[F]): Window[F] =
     new Window[F] {
+
+      def history[S](implicit serializer: Serializer[F, S]) = History(window, window.history)
 
       def localStorage = Storage(window.localStorage)
 
