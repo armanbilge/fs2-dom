@@ -53,8 +53,6 @@ object Node {
 
 opaque type Document[F[_]] <: Node[F] = dom.Document
 object Document {
-  def apply[F[_]: Dom]: Document[F] = dom.window.document
-
   extension [F[_]](document: Document[F]) {
 
     def createElement(tagName: String)(using F: Dom[F]): F[Element[F]] =
