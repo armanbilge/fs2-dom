@@ -49,6 +49,6 @@ abstract class StorageSuite(storage: Storage[IO]) extends CatsEffectSuite {
 
 }
 
-class LocalStorageSuite extends StorageSuite(Storage.local)
+class LocalStorageSuite extends StorageSuite(Window[IO].localStorage)
 
-class SessionStorageSuite extends StorageSuite(Storage.session)
+class SessionStorageSuite extends StorageSuite(Window[IO].sessionStorage)

@@ -24,9 +24,6 @@ import cats.effect.syntax.all._
 import cats.syntax.all._
 import fs2.dom.facade.LockRequestOptions
 import org.scalajs.dom
-import org.scalajs.dom.window
-
-import scala.scalajs.js
 
 abstract class LockManager[F[_]] private {
 
@@ -42,10 +39,7 @@ abstract class LockManager[F[_]] private {
 
 object LockManager {
 
-  def apply[F[_]: Async]: LockManager[F] =
-    apply(window.navigator.asInstanceOf[js.Dynamic].locks.asInstanceOf[facade.LockManager])
-
-  private def apply[F[_]](manager: facade.LockManager)(implicit F: Async[F]): LockManager[F] =
+  private[dom] def apply[F[_]](manager: facade.LockManager)(implicit F: Async[F]): LockManager[F] =
     new LockManager[F] {
 
       def exclusive(name: String) = request(name, "exclusive", false).void

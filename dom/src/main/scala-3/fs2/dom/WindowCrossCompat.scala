@@ -19,23 +19,20 @@ package fs2.dom
 import cats.effect.kernel.Async
 import org.scalajs.dom
 
-abstract class Clipboard[F[_]] private {
+private trait WindowCrossCompat[F[_]] {
 
-  def readText: F[String]
+  implicit def given_Dom_F: Dom[F]
 
-  def writeText(text: String): F[Unit]
+  def document: HtmlDocument[F]
 
 }
 
-object Clipboard {
+private trait WindowImplCrossCompat[F[_]](using Async[F]) extends WindowCrossCompat[F] {
 
-  private[dom] def apply[F[_]](clipboard: dom.Clipboard)(implicit F: Async[F]): Clipboard[F] =
-    new Clipboard[F] {
+  private[dom] def window: dom.Window
 
-      def readText = F.fromPromise(F.delay(clipboard.readText()))
+  implicit def given_Dom_F = Dom.forAsync
 
-      def writeText(text: String) = F.fromPromise(F.delay(clipboard.writeText(text)))
-
-    }
+  def document = window.document.asInstanceOf[HtmlDocument[F]]
 
 }

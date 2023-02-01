@@ -25,7 +25,7 @@ import scala.concurrent.duration._
 
 class HistorySuite extends CatsEffectSuite {
 
-  val history = History[IO, Int]
+  val history = Window[IO].history[Int]
 
   test("history") {
     Channel.unbounded[IO, Int].flatMap { ch =>

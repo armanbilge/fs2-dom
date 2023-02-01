@@ -26,7 +26,6 @@ import fs2.concurrent.Signal
 import org.scalajs.dom
 import org.scalajs.dom.EventListenerOptions
 import org.scalajs.dom.ScrollRestoration
-import org.scalajs.dom.window
 
 abstract class History[F[_], S] private {
 
@@ -48,7 +47,10 @@ abstract class History[F[_], S] private {
 }
 
 object History {
-  def apply[F[_], S](implicit F: Async[F], serializer: Serializer[F, S]): History[F, S] =
+  private[dom] def apply[F[_], S](window: dom.Window, history: dom.History)(implicit
+      F: Async[F],
+      serializer: Serializer[F, S]
+  ): History[F, S] =
     new History[F, S] {
 
       def state = new Signal[F, Option[S]] {
@@ -62,7 +64,7 @@ object History {
           (head ++ tail).concurrently(listener)
         }
 
-        def get = OptionT(F.delay(Option(window.history.state)))
+        def get = OptionT(F.delay(Option(history.state)))
           .semiflatMap(serializer.deserialize(_))
           .value
 
@@ -71,29 +73,29 @@ object History {
 
       def length = new Signal[F, Int] {
         def discrete = state.discrete.evalMap(_ => get)
-        def get = F.delay(window.history.length)
+        def get = F.delay(history.length)
         def continuous = Stream.repeatEval(get)
       }
 
       def scrollRestoration = new WrappedRef(
-        () => window.history.scrollRestoration,
-        window.history.scrollRestoration = _
+        () => history.scrollRestoration,
+        history.scrollRestoration = _
       )
 
-      def forward = asyncPopState(window.history.forward())
-      def back = asyncPopState(window.history.back())
-      def go = asyncPopState(window.history.go())
-      def go(delta: Int) = asyncPopState(window.history.go(delta))
+      def forward = asyncPopState(history.forward())
+      def back = asyncPopState(history.back())
+      def go = asyncPopState(history.go())
+      def go(delta: Int) = asyncPopState(history.go(delta))
 
       def pushState(state: S) =
-        serializer.serialize(state).flatMap(s => F.delay(window.history.pushState(s, "")))
+        serializer.serialize(state).flatMap(s => F.delay(history.pushState(s, "")))
       def pushState(state: S, url: String) =
-        serializer.serialize(state).flatMap(s => F.delay(window.history.pushState(s, "", url)))
+        serializer.serialize(state).flatMap(s => F.delay(history.pushState(s, "", url)))
 
       def replaceState(state: S) =
-        serializer.serialize(state).flatMap(s => F.delay(window.history.replaceState(s, "")))
+        serializer.serialize(state).flatMap(s => F.delay(history.replaceState(s, "")))
       def replaceState(state: S, url: String) =
-        serializer.serialize(state).flatMap(s => F.delay(window.history.replaceState(s, "", url)))
+        serializer.serialize(state).flatMap(s => F.delay(history.replaceState(s, "", url)))
 
       def asyncPopState(thunk: => Unit): F[Unit] = F.async_[Unit] { cb =>
         window.addEventListener[dom.PopStateEvent](

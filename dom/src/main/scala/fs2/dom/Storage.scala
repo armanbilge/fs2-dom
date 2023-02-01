@@ -18,12 +18,12 @@ package fs2
 package dom
 
 import cats.syntax.all._
-import cats.effect.kernel.Async
+import cats.effect.kernel.Sync
 import org.scalajs.dom
 
 abstract class Storage[F[_]] private {
 
-  def events: Stream[F, Storage.Event]
+  def events(window: Window[F]): Stream[F, Storage.Event]
 
   def length: F[Int]
 
@@ -41,10 +41,6 @@ abstract class Storage[F[_]] private {
 
 object Storage {
 
-  def local[F[_]: Async]: Storage[F] = apply(dom.window.localStorage)
-
-  def session[F[_]: Async]: Storage[F] = apply(dom.window.sessionStorage)
-
   sealed abstract class Event {
     def url: String
   }
@@ -56,9 +52,9 @@ object Storage {
     final case class Updated private (key: String, oldValue: String, newValue: String, url: String)
         extends Event
 
-    private[Storage] def fromStorageEvent(ev: dom.StorageEvent): Event =
-      Option(ev.key).fold[Event](Cleared(ev.url)) { key =>
-        (Option(ev.oldValue), Option(ev.newValue)) match {
+    private[Storage] def fromStorageEvent[F[_]](ev: StorageEvent[F]): Event =
+      ev.key.fold[Event](Cleared(ev.url)) { key =>
+        (ev.oldValue, ev.newValue) match {
           case (Some(oldValue), None)           => Removed(key, oldValue, ev.url)
           case (None, Some(newValue))           => Added(key, newValue, ev.url)
           case (Some(oldValue), Some(newValue)) => Updated(key, oldValue, newValue, ev.url)
@@ -67,31 +63,31 @@ object Storage {
       }
   }
 
-  private[dom] def apply[F[_]](storage: dom.Storage)(implicit F: Async[F]): Storage[F] =
-    new Storage[F] {
+  private[dom] def apply[F[_]: Sync](storage: dom.Storage): Storage[F] =
+    new WrappedStorage(storage)
 
-      def events =
-        fs2.dom.events[F, dom.StorageEvent](dom.window, "storage").mapFilter { ev =>
-          if (ev.storageArea eq storage)
-            Some(Event.fromStorageEvent(ev))
-          else
-            None
-        }
+  private final case class WrappedStorage[F[_]](storage: dom.Storage)(implicit F: Sync[F])
+      extends Storage[F] {
 
-      def length = F.delay(storage.length)
+    def events(window: Window[F]) =
+      window.storageEvents.mapFilter { ev =>
+        Option.when(ev.storageArea == this)(Event.fromStorageEvent(ev))
+      }
 
-      def getItem(key: String) =
-        F.delay(Option(storage.getItem(key)))
+    def length = F.delay(storage.length)
 
-      def setItem(key: String, item: String) =
-        F.delay(storage.setItem(key, item))
+    def getItem(key: String) =
+      F.delay(Option(storage.getItem(key)))
 
-      def removeItem(key: String) =
-        F.delay(storage.removeItem(key))
+    def setItem(key: String, item: String) =
+      F.delay(storage.setItem(key, item))
 
-      def key(i: Int) = F.delay(Option(storage.key(i)))
+    def removeItem(key: String) =
+      F.delay(storage.removeItem(key))
 
-      def clear = F.delay(storage.clear())
+    def key(i: Int) = F.delay(Option(storage.key(i)))
 
-    }
+    def clear = F.delay(storage.clear())
+
+  }
 }

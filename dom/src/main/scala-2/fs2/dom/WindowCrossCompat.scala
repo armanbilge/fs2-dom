@@ -16,26 +16,6 @@
 
 package fs2.dom
 
-import cats.effect.kernel.Async
-import org.scalajs.dom
+private[dom] trait WindowCrossCompat[F[_]]
 
-abstract class Clipboard[F[_]] private {
-
-  def readText: F[String]
-
-  def writeText(text: String): F[Unit]
-
-}
-
-object Clipboard {
-
-  private[dom] def apply[F[_]](clipboard: dom.Clipboard)(implicit F: Async[F]): Clipboard[F] =
-    new Clipboard[F] {
-
-      def readText = F.fromPromise(F.delay(clipboard.readText()))
-
-      def writeText(text: String) = F.fromPromise(F.delay(clipboard.writeText(text)))
-
-    }
-
-}
+private trait WindowImplCrossCompat[F[_]] extends WindowCrossCompat[F]
