@@ -26,7 +26,7 @@ ThisBuild / githubWorkflowBuildPreamble +=
   )
 
 val ceVersion = "3.4.6"
-val fs2Version = "3.5.0"
+val fs2Version = "3.6.0"
 val circeVersion = "0.14.3"
 val sjsDomVersion = "2.3.0"
 val munitCEVersion = "2.0.0-M3"
