@@ -18,8 +18,10 @@ package fs2.dom
 
 import cats.data.OptionT
 import cats.effect.kernel.Async
+import cats.effect.kernel.Concurrent
 import cats.effect.kernel.Ref
 import cats.effect.std.Queue
+import cats.effect.syntax.all._
 import cats.syntax.all._
 import fs2.Stream
 import fs2.concurrent.Signal
@@ -54,14 +56,29 @@ object History {
     new History[F, S] {
 
       def state = new Signal[F, Option[S]] {
-        def discrete = Stream.eval(Queue.circularBuffer[F, dom.PopStateEvent](1)).flatMap { queue =>
-          val head = Stream.eval(get)
-          val tail =
-            Stream.repeatEval(queue.take).evalMap(e => serializer.deserialize(e.state).map(Some(_)))
+        override def getAndDiscreteUpdates(implicit ev: Concurrent[F]) =
+          getAndDiscreteUpdatesImpl
 
-          val listener = events[F, dom.PopStateEvent](window, "popstate").foreach(queue.offer(_))
+        private[this] def getAndDiscreteUpdatesImpl =
+          for {
+            queue <- Queue.circularBuffer[F, dom.PopStateEvent](1).toResource
+            _ <- events[F, dom.PopStateEvent](window, "popstate")
+              .foreach(queue.offer(_))
+              .compile
+              .drain
+              .background
+            got <- get.toResource
+            updates = Stream
+              .repeatEval {
+                for {
+                  event <- queue.take
+                  state <- serializer.deserialize(event.state)
+                } yield Some(state)
+              }
+          } yield (got, updates)
 
-          (head ++ tail).concurrently(listener)
+        def discrete = Stream.resource(getAndDiscreteUpdatesImpl).flatMap { case (got, updates) =>
+          Stream.emit(got) ++ updates
         }
 
         def get = OptionT(F.delay(Option(history.state)))
