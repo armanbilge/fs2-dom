@@ -22,7 +22,7 @@ import org.scalajs.dom
 
 abstract class Window[F[_]] private extends WindowCrossCompat[F] {
 
-  def history[S](implicit serializer: Serializer[F, S]): History[F, S]
+  def history[S: Serializer]: History[F, S]
 
   def localStorage: Storage[F]
 
@@ -46,7 +46,7 @@ object Window {
 
       private[dom] def window = _window
 
-      def history[S](implicit serializer: Serializer[F, S]) = History(window, window.history)
+      def history[S: Serializer] = History(window, window.history)
 
       def localStorage = Storage(window.localStorage)
 

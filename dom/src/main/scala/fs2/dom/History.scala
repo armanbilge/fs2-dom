@@ -51,7 +51,7 @@ abstract class History[F[_], S] private {
 object History {
   private[dom] def apply[F[_], S](window: dom.Window, history: dom.History)(implicit
       F: Async[F],
-      serializer: Serializer[F, S]
+      serializer: Serializer[S]
   ): History[F, S] =
     new History[F, S] {
 
@@ -72,7 +72,7 @@ object History {
               .repeatEval {
                 for {
                   event <- queue.take
-                  state <- serializer.deserialize(event.state)
+                  state <- serializer.deserialize(event.state).liftTo[F]
                 } yield Some(state)
               }
           } yield (got, updates)
@@ -82,7 +82,7 @@ object History {
         }
 
         def get = OptionT(F.delay(Option(history.state)))
-          .semiflatMap(serializer.deserialize(_))
+          .semiflatMap(serializer.deserialize(_).liftTo[F])
           .value
 
         def continuous = Stream.repeatEval(get)
@@ -105,14 +105,14 @@ object History {
       def go(delta: Int) = asyncPopState(history.go(delta))
 
       def pushState(state: S) =
-        serializer.serialize(state).flatMap(s => F.delay(history.pushState(s, "")))
+        F.delay(history.pushState(serializer.serialize(state), ""))
       def pushState(state: S, url: String) =
-        serializer.serialize(state).flatMap(s => F.delay(history.pushState(s, "", url)))
+        F.delay(history.pushState(serializer.serialize(state), "", url))
 
       def replaceState(state: S) =
-        serializer.serialize(state).flatMap(s => F.delay(history.replaceState(s, "")))
+        F.delay(history.replaceState(serializer.serialize(state), ""))
       def replaceState(state: S, url: String) =
-        serializer.serialize(state).flatMap(s => F.delay(history.replaceState(s, "", url)))
+        F.delay(history.replaceState(serializer.serialize(state), "", url))
 
       def asyncPopState(thunk: => Unit): F[Unit] = F.async_[Unit] { cb =>
         window.addEventListener[dom.PopStateEvent](

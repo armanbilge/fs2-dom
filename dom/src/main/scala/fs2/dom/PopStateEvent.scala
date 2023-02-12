@@ -21,7 +21,7 @@ import org.scalajs.dom
 
 abstract class PopStateEvent[F[_]] private[dom] extends Event[F] {
 
-  def state[F[_], S](implicit serializer: Serializer[F, S]): F[S]
+  def state[S: Serializer]: Either[Throwable, S]
 
 }
 
@@ -38,6 +38,5 @@ private trait PopStateEventImpl[F[_]] extends PopStateEvent[F] with EventImpl[F]
   def event: dom.PopStateEvent
   implicit def F: Sync[F]
 
-  def state[F[_], S](implicit serializer: Serializer[F, S]) =
-    serializer.deserialize(event.state)
+  def state[S](implicit serializer: Serializer[S]) = serializer.deserialize(event.state)
 }
