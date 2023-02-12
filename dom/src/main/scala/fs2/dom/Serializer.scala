@@ -22,7 +22,7 @@ import scala.scalajs.js
 
 /** @see [[https://developer.mozilla.org/en-US/docs/Glossary/Serializable_object]]
   *
-  * @todo So far the only instance of [[Serializer]] is for [[Unit]].
+  * @todo So far the only instance of [[Serializer]] is for `Unit`.
   * Track progress in [[https://github.com/armanbilge/fs2-dom/issues/59 fs2-dom#59]]).
   */
 sealed abstract class Serializer[A] private {
