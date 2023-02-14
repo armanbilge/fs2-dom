@@ -16,46 +16,37 @@
 
 package fs2.dom
 
-import cats.Invariant
-import cats.effect.kernel.Sync
 import cats.syntax.all._
-import io.circe.Decoder
-import io.circe.Encoder
-import io.circe.scalajs._
 
 import scala.scalajs.js
 
 /** @see [[https://developer.mozilla.org/en-US/docs/Glossary/Serializable_object]]
+  *
+  * @todo So far the only instance of [[Serializer]] is for `Unit`.
+  * Track progress in [[https://github.com/armanbilge/fs2-dom/issues/59 fs2-dom#59]]).
   */
-trait Serializer[F[_], A] { outer =>
+sealed abstract class Serializer[A] private {
 
-  def serialize(a: A): F[js.Any]
+  def serialize(a: A): js.Any
 
-  def deserialize(serialized: js.Any): F[A]
-
-  final def imap[B](f: A => B)(g: B => A)(implicit F: Invariant[F]): Serializer[F, B] =
-    new Serializer[F, B] {
-      def serialize(b: B): F[js.Any] = outer.serialize(g(b))
-      def deserialize(serialized: js.Any): F[B] = outer.deserialize(serialized).imap(f)(g)
-    }
+  def deserialize(serialized: js.Any): Either[Throwable, A]
 
 }
 
 object Serializer {
 
-  implicit def invariant[F[_]: Invariant]: Invariant[Serializer[F, *]] =
-    new Invariant[Serializer[F, *]] {
-      def imap[A, B](fa: Serializer[F, A])(f: A => B)(g: B => A): Serializer[F, B] =
-        fa.imap(f)(g)
-    }
+  implicit def unit: Serializer[Unit] = new Serializer[Unit] {
+    def serialize(u: Unit): js.Any = u
+    def deserialize(serialized: js.Any): Either[Throwable, Unit] = Either.unit
+  }
 
-  implicit def fromCirceCodec[F[_], A](implicit
-      F: Sync[F],
-      decoder: Decoder[A],
-      encoder: Encoder[A]
-  ): Serializer[F, A] = new Serializer[F, A] {
-    def serialize(a: A): F[js.Any] = F.delay(a.asJsAny)
-    def deserialize(serialized: js.Any): F[A] = decodeJs[A](serialized).liftTo[F]
+  // used in test
+  private[dom] implicit def int: Serializer[Int] = new Serializer[Int] {
+    def serialize(i: Int): js.Any = i
+    def deserialize(serialized: js.Any): Either[Throwable, Int] = (serialized: Any) match {
+      case i: Int => Right(i)
+      case x      => Left(new NumberFormatException(x.toString))
+    }
   }
 
 }

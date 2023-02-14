@@ -27,7 +27,6 @@ ThisBuild / githubWorkflowBuildPreamble +=
 
 val ceVersion = "3.4.6"
 val fs2Version = "3.6.1"
-val circeVersion = "0.14.3"
 val sjsDomVersion = "2.3.0"
 val munitCEVersion = "2.0.0-M3"
 val scalaCheckEffectVersion = "2.0.0-M2"
@@ -54,8 +53,7 @@ lazy val dom = project
     libraryDependencies ++= Seq(
       "org.typelevel" %%% "cats-effect" % ceVersion,
       "co.fs2" %%% "fs2-core" % fs2Version,
-      "org.scala-js" %%% "scalajs-dom" % sjsDomVersion,
-      "io.circe" %%% "circe-scalajs" % circeVersion
+      "org.scala-js" %%% "scalajs-dom" % sjsDomVersion
     )
   )
 
