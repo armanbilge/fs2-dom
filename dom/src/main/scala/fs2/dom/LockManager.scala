@@ -22,7 +22,6 @@ import cats.effect.kernel.Resource
 import cats.effect.std.Dispatcher
 import cats.effect.syntax.all._
 import cats.syntax.all._
-import fs2.dom.facade.LockRequestOptions
 import org.scalajs.dom
 
 abstract class LockManager[F[_]] private {
@@ -39,18 +38,18 @@ abstract class LockManager[F[_]] private {
 
 object LockManager {
 
-  private[dom] def apply[F[_]](manager: facade.LockManager)(implicit F: Async[F]): LockManager[F] =
+  private[dom] def apply[F[_]](manager: dom.LockManager)(implicit F: Async[F]): LockManager[F] =
     new LockManager[F] {
 
-      def exclusive(name: String) = request(name, "exclusive", false).void
+      def exclusive(name: String) = request(name, dom.LockMode.exclusive, false).void
 
-      def tryExclusive(name: String) = request(name, "exclusive", true).map(_.isDefined)
+      def tryExclusive(name: String) = request(name, dom.LockMode.exclusive, true).map(_.isDefined)
 
-      def shared(name: String) = request(name, "shared", false).void
+      def shared(name: String) = request(name, dom.LockMode.shared, false).void
 
-      def tryShared(name: String) = request(name, "shared", true).map(_.isDefined)
+      def tryShared(name: String) = request(name, dom.LockMode.shared, true).map(_.isDefined)
 
-      def request(name: String, _mode: String, _ifAvailable: Boolean) =
+      def request(name: String, _mode: dom.LockMode, _ifAvailable: Boolean) =
         for {
           dispatcher <- Dispatcher.sequential
 
@@ -60,13 +59,13 @@ object LockManager {
             else
               Resource.eval(F.delay(Some(new dom.AbortController)))
 
-          startGate <- Resource.eval(F.deferred[facade.Lock])
+          startGate <- Resource.eval(F.deferred[dom.Lock])
           endGate <- Resource.eval(F.deferred[Unit])
 
           request <- F.background {
             F.fromPromise {
               F.delay {
-                val options = new LockRequestOptions {
+                val options = new dom.LockOptions {
                   mode = _mode
                   ifAvailable = _ifAvailable
                 }

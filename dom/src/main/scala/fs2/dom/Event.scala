@@ -27,7 +27,7 @@ abstract class Event[F[_]] private[dom] {
 
   def cancelable: Boolean
 
-  // def composed: Boolean
+  def composed: Boolean
 
   def defaultPrevented: F[Boolean]
 
@@ -61,7 +61,7 @@ private trait EventImpl[F[_]] extends Event[F] {
 
   def bubbles = event.bubbles
   def cancelable = event.cancelable
-  // def composed = event.composed
+  def composed = event.composed
   def defaultPrevented = F.delay(event.defaultPrevented)
   def eventPhase = F.delay(event.eventPhase)
   def isTrusted = event.isTrusted
