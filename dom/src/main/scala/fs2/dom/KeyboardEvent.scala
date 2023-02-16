@@ -57,7 +57,7 @@ private trait KeyboardEventImpl[F[_]] extends KeyboardEvent[F] with UIEventImpl[
   implicit def F: Sync[F]
 
   def altKey = event.altKey
-  def code = event.asInstanceOf[scalajs.js.Dynamic].code.asInstanceOf[String]
+  def code = event.code
   def ctrlKey = event.ctrlKey
   // def isComposing = event.isComposing
   def key = event.key

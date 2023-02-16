@@ -19,8 +19,6 @@ package fs2.dom
 import cats.effect.kernel.Async
 import org.scalajs.dom
 
-import scala.scalajs.js
-
 abstract class Navigator[F[_]] private {
 
   def clipboard: Clipboard[F]
@@ -36,9 +34,7 @@ object Navigator {
 
       def clipboard = Clipboard(navigator.clipboard)
 
-      def locks = LockManager(
-        navigator.asInstanceOf[js.Dynamic].locks.asInstanceOf[facade.LockManager]
-      )
+      def locks = LockManager(navigator.locks)
 
     }
 
