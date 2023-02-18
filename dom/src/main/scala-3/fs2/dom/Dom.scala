@@ -68,7 +68,15 @@ opaque type HtmlDocument[F[_]] <: Document[F] = dom.HTMLDocument
 
 opaque type Element[F[_]] <: Node[F] = dom.Element
 opaque type HtmlElement[F[_]] <: Element[F] = dom.HTMLElement
+
 opaque type HtmlAnchorElement[F[_]] <: HtmlElement[F] = dom.HTMLAnchorElement
+object HtmlAnchorElement {
+  extension [F[_]](anchor: HtmlAnchorElement[F]) {
+    def href(using Dom[F]): Ref[F, String] =
+      new WrappedRef(() => anchor.href, anchor.href = _)
+  }
+}
+
 opaque type HtmlAreaElement[F[_]] <: HtmlElement[F] = dom.HTMLAreaElement
 opaque type HtmlAudioElement[F[_]] <: HtmlElement[F] = dom.HTMLAudioElement
 opaque type HtmlBaseElement[F[_]] <: HtmlElement[F] = dom.HTMLBaseElement
