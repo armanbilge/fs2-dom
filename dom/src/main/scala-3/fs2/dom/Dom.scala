@@ -34,6 +34,9 @@ object Node {
     def firstChild(using F: Dom[F]): F[Option[Node[F]]] =
       F.delay(Option(node.firstChild))
 
+    def parentNode(using F: Dom[F]): F[Option[Node[F]]] =
+      F.delay(Option(node.parentNode))
+
     def appendChild(child: Node[F])(using F: Dom[F]): F[Unit] = F.delay {
       node.appendChild(child)
       ()
@@ -67,6 +70,16 @@ object Document {
 opaque type HtmlDocument[F[_]] <: Document[F] = dom.HTMLDocument
 
 opaque type Element[F[_]] <: Node[F] = dom.Element
+object Element {
+  extension [F[_]](element: Element[F]) {
+    def children(using Dom[F]): HtmlCollection[IO, Element[IO]] =
+      HtmlCollection(element.children)
+
+    def innerHtml(using Dom[F]): Ref[F, String] =
+      new WrappedRef(() => element.innerHTML, element.innerHTML = _)
+  }
+}
+
 opaque type HtmlElement[F[_]] <: Element[F] = dom.HTMLElement
 
 opaque type HtmlAnchorElement[F[_]] <: HtmlElement[F] = dom.HTMLAnchorElement
