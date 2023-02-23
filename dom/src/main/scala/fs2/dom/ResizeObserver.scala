@@ -16,13 +16,13 @@
 
 package fs2.dom
 
-import scalajs.js
 import org.scalajs.dom
 import cats.effect.kernel.Async
 import cats.effect.std.Dispatcher
 import cats.effect.kernel.Resource
+import cats.effect.kernel.Sync
 
-trait ResizeObserver[F[_]] {
+abstract class ResizeObserver[F[_]] private {
 
   def observe(target: dom.Element): F[Unit]
 
@@ -30,32 +30,39 @@ trait ResizeObserver[F[_]] {
 
   def unobserve(target: dom.Element): F[Unit]
 
-  def disconnect(): F[Unit]
+  def disconnect: F[Unit]
 
 }
 
 object ResizeObserver {
 
   def apply[F[_]](
-      callback: (js.Array[dom.ResizeObserverEntry], dom.ResizeObserver) => F[Unit]
+      callback: (List[dom.ResizeObserverEntry], ResizeObserver[F]) => F[Unit]
   )(implicit F: Async[F]): Resource[F, ResizeObserver[F]] = for {
     dispatcher <- Dispatcher.parallel[F]
     jsObserver <- Resource.make(
-      F.delay(new dom.ResizeObserver((a, b) => dispatcher.unsafeRunAndForget(callback(a, b))))
+      F.delay(
+        new dom.ResizeObserver((a, b) =>
+          dispatcher.unsafeRunAndForget(callback(a.toList, fromJsObserver(b)))
+        )
+      )
     )(obs => F.delay(obs.disconnect()))
-  } yield new ResizeObserver[F] {
+  } yield fromJsObserver(jsObserver)
 
-    override def observe(target: dom.Element, options: dom.ResizeObserverOptions): F[Unit] =
-      F.delay(jsObserver.observe(target, options))
+  private def fromJsObserver[F[_]](
+      jsObserver: dom.ResizeObserver
+  )(implicit F: Sync[F]): ResizeObserver[F] =
+    new ResizeObserver[F] {
+      override def observe(target: dom.Element, options: dom.ResizeObserverOptions): F[Unit] =
+        F.delay(jsObserver.observe(target, options))
 
-    override def observe(target: dom.Element): F[Unit] =
-      F.delay(jsObserver.observe(target))
+      override def observe(target: dom.Element): F[Unit] =
+        F.delay(jsObserver.observe(target))
 
-    override def unobserve(target: dom.Element): F[Unit] =
-      F.delay(jsObserver.unobserve(target))
+      override def unobserve(target: dom.Element): F[Unit] =
+        F.delay(jsObserver.unobserve(target))
 
-    override def disconnect(): F[Unit] = F.delay(jsObserver.disconnect())
-
-  }
+      override def disconnect: F[Unit] = F.delay(jsObserver.disconnect())
+    }
 
 }
