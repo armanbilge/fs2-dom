@@ -23,7 +23,7 @@ import org.scalajs.dom
 
 import scala.scalajs.js
 
-trait Dom[F[_]] extends js.Any
+sealed trait Dom[F[_]] extends js.Any
 object Dom {
   @inline implicit def forIO: Dom[IO] = IO.asyncForIO.asInstanceOf[Dom[IO]]
   @inline def forAsync[F[_]](implicit F: Async[F]): Dom[F] = F.asInstanceOf[Dom[F]]
@@ -33,7 +33,7 @@ object Dom {
     dom.asInstanceOf[Async[F]]
 }
 
-trait Node[F[_]] extends js.Any
+sealed trait Node[F[_]] extends js.Any
 object Node {
 
   implicit def ops[F[_]](node: Node[F]): Ops[F] = new Ops(node.asInstanceOf[dom.Node])
@@ -66,7 +66,7 @@ object Node {
   }
 }
 
-trait Document[F[_]] extends Node[F]
+sealed trait Document[F[_]] extends Node[F]
 object Document {
 
   implicit def ops[F[_]](document: Document[F]): Ops[F] = new Ops(
@@ -89,9 +89,9 @@ object Document {
   }
 }
 
-trait HtmlDocument[F[_]] extends Document[F]
+sealed trait HtmlDocument[F[_]] extends Document[F]
 
-trait Element[F[_]] extends Node[F]
+sealed trait Element[F[_]] extends Node[F]
 object Element {
   implicit def ops[F[_]](element: Element[F]): Ops[F] = new Ops(element.asInstanceOf[dom.Element])
 
@@ -111,9 +111,9 @@ object Element {
   }
 }
 
-trait HtmlElement[F[_]] extends Element[F]
+sealed trait HtmlElement[F[_]] extends Element[F]
 
-trait HtmlAnchorElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlAnchorElement[F[_]] extends HtmlElement[F]
 object HtmlAnchorElement {
   implicit def ops[F[_]](element: HtmlAnchorElement[F]): Ops[F] =
     new Ops(element.asInstanceOf[dom.HTMLAnchorElement])
@@ -125,12 +125,12 @@ object HtmlAnchorElement {
   }
 }
 
-trait HtmlAreaElement[F[_]] extends HtmlElement[F]
-trait HtmlAudioElement[F[_]] extends HtmlElement[F]
-trait HtmlBaseElement[F[_]] extends HtmlElement[F]
-trait HtmlBodyElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlAreaElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlAudioElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlBaseElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlBodyElement[F[_]] extends HtmlElement[F]
 
-trait HtmlButtonElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlButtonElement[F[_]] extends HtmlElement[F]
 object HtmlButtonElement {
   implicit def ops[F[_]](element: HtmlButtonElement[F]): Ops[F] =
     new Ops(element.asInstanceOf[dom.HTMLButtonElement])
@@ -142,22 +142,22 @@ object HtmlButtonElement {
   }
 }
 
-trait HtmlBrElement[F[_]] extends HtmlElement[F]
-trait HtmlCanvasElement[F[_]] extends HtmlElement[F]
-trait HtmlDataListElement[F[_]] extends HtmlElement[F]
-trait HtmlDivElement[F[_]] extends HtmlElement[F]
-trait HtmlDListElement[F[_]] extends HtmlElement[F]
-trait HtmlEmbedElement[F[_]] extends HtmlElement[F]
-trait HtmlFieldSetElement[F[_]] extends HtmlElement[F]
-trait HtmlFormElement[F[_]] extends HtmlElement[F]
-trait HtmlHeadElement[F[_]] extends HtmlElement[F]
-trait HtmlHeadingElement[F[_]] extends HtmlElement[F]
-trait HtmlHrElement[F[_]] extends HtmlElement[F]
-trait HtmlHtmlElement[F[_]] extends HtmlElement[F]
-trait HtmlIFrameElement[F[_]] extends HtmlElement[F]
-trait HtmlImageElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlBrElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlCanvasElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlDataListElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlDivElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlDListElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlEmbedElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlFieldSetElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlFormElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlHeadElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlHeadingElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlHrElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlHtmlElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlIFrameElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlImageElement[F[_]] extends HtmlElement[F]
 
-trait HtmlInputElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlInputElement[F[_]] extends HtmlElement[F]
 object HtmlInputElement {
   implicit def ops[F[_]](element: HtmlInputElement[F]): Ops[F] =
     new Ops(element.asInstanceOf[dom.HTMLInputElement])
@@ -172,19 +172,19 @@ object HtmlInputElement {
   }
 }
 
-trait HtmlLinkElement[F[_]] extends HtmlElement[F]
-trait HtmlLabelElement[F[_]] extends HtmlElement[F]
-trait HtmlLegendElement[F[_]] extends HtmlElement[F]
-trait HtmlLiElement[F[_]] extends HtmlElement[F]
-trait HtmlMapElement[F[_]] extends HtmlElement[F]
-trait HtmlMenuElement[F[_]] extends HtmlElement[F]
-trait HtmlMetaElement[F[_]] extends HtmlElement[F]
-trait HtmlModElement[F[_]] extends HtmlElement[F]
-trait HtmlObjectElement[F[_]] extends HtmlElement[F]
-trait HtmlOListElement[F[_]] extends HtmlElement[F]
-trait HtmlOptGroupElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlLinkElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlLabelElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlLegendElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlLiElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlMapElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlMenuElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlMetaElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlModElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlObjectElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlOListElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlOptGroupElement[F[_]] extends HtmlElement[F]
 
-trait HtmlOptionElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlOptionElement[F[_]] extends HtmlElement[F]
 object HtmlOptionElement {
   implicit def ops[F[_]](element: HtmlOptionElement[F]): Ops[F] =
     new Ops(element.asInstanceOf[dom.HTMLOptionElement])
@@ -196,14 +196,14 @@ object HtmlOptionElement {
   }
 }
 
-trait HtmlParagraphElement[F[_]] extends HtmlElement[F]
-trait HtmlParamElement[F[_]] extends HtmlElement[F]
-trait HtmlPreElement[F[_]] extends HtmlElement[F]
-trait HtmlProgressElement[F[_]] extends HtmlElement[F]
-trait HtmlQuoteElement[F[_]] extends HtmlElement[F]
-trait HtmlScriptElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlParagraphElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlParamElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlPreElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlProgressElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlQuoteElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlScriptElement[F[_]] extends HtmlElement[F]
 
-trait HtmlSelectElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlSelectElement[F[_]] extends HtmlElement[F]
 object HtmlSelectElement {
   implicit def ops[F[_]](element: HtmlSelectElement[F]): Ops[F] =
     new Ops(element.asInstanceOf[dom.HTMLSelectElement])
@@ -215,17 +215,17 @@ object HtmlSelectElement {
   }
 }
 
-trait HtmlSourceElement[F[_]] extends HtmlElement[F]
-trait HtmlSpanElement[F[_]] extends HtmlElement[F]
-trait HtmlStyleElement[F[_]] extends HtmlElement[F]
-trait HtmlTableElement[F[_]] extends HtmlElement[F]
-trait HtmlTableCaptionElement[F[_]] extends HtmlElement[F]
-trait HtmlTableCellElement[F[_]] extends HtmlElement[F]
-trait HtmlTableColElement[F[_]] extends HtmlElement[F]
-trait HtmlTableRowElement[F[_]] extends HtmlElement[F]
-trait HtmlTableSectionElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlSourceElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlSpanElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlStyleElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlTableElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlTableCaptionElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlTableCellElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlTableColElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlTableRowElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlTableSectionElement[F[_]] extends HtmlElement[F]
 
-trait HtmlTextAreaElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlTextAreaElement[F[_]] extends HtmlElement[F]
 object HtmlTextAreaElement {
   implicit def ops[F[_]](element: HtmlTextAreaElement[F]): Ops[F] =
     new Ops(element.asInstanceOf[dom.HTMLTextAreaElement])
@@ -237,8 +237,8 @@ object HtmlTextAreaElement {
   }
 }
 
-trait HtmlTitleElement[F[_]] extends HtmlElement[F]
-trait HtmlTrackElement[F[_]] extends HtmlElement[F]
-trait HtmlUListElement[F[_]] extends HtmlElement[F]
-trait HtmlVideoElement[F[_]] extends HtmlElement[F]
-trait HtmlDialogElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlTitleElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlTrackElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlUListElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlVideoElement[F[_]] extends HtmlElement[F]
+sealed trait HtmlDialogElement[F[_]] extends HtmlElement[F]
