@@ -61,8 +61,8 @@ object Document {
     def createElement(tagName: String)(using F: Dom[F]): F[Element[F]] =
       F.delay(document.createElement(tagName))
 
-    def getElementById(id: String)(using F: Dom[F]): F[Option[HtmlElement[F]]] =
-      F.delay(Option(document.getElementById(id).asInstanceOf[HtmlElement[F]]))
+    def getElementById(id: String)(using F: Dom[F]): F[Option[Element[F]]] =
+      F.delay(Option(document.getElementById(id)))
 
   }
 }
@@ -72,7 +72,7 @@ opaque type HtmlDocument[F[_]] <: Document[F] = dom.HTMLDocument
 opaque type Element[F[_]] <: Node[F] = dom.Element
 object Element {
   extension [F[_]](element: Element[F]) {
-    def children(using Dom[F]): HtmlCollection[IO, Element[IO]] =
+    def children(using Dom[F]): HtmlCollection[F, Element[F]] =
       HtmlCollection(element.children)
 
     def innerHtml(using Dom[F]): Ref[F, String] =

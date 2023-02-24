@@ -20,7 +20,7 @@ import cats.effect.kernel.Async
 import fs2.Stream
 import org.scalajs.dom
 
-abstract class Window[F[_]] private extends WindowCrossCompat[F] {
+abstract class Window[F[_]] private {
 
   def history[S: Serializer]: History[F, S]
 
@@ -34,6 +34,10 @@ abstract class Window[F[_]] private extends WindowCrossCompat[F] {
 
   def storageEvents: Stream[F, StorageEvent[F]]
 
+  implicit def given_Dom_F: Dom[F]
+
+  def document: HtmlDocument[F]
+
 }
 
 object Window {
@@ -41,10 +45,8 @@ object Window {
   def apply[F[_]](implicit F: Async[F]): Window[F] =
     apply(dom.window)
 
-  private def apply[F[_]](_window: dom.Window)(implicit F: Async[F]): Window[F] =
-    new Window[F] with WindowImplCrossCompat[F] {
-
-      private[dom] def window = _window
+  private def apply[F[_]](window: dom.Window)(implicit F: Async[F]): Window[F] =
+    new Window[F] {
 
       def history[S: Serializer] = History(window, window.history)
 
@@ -58,6 +60,10 @@ object Window {
 
       def storageEvents: Stream[F, StorageEvent[F]] =
         events[F, dom.StorageEvent](window, "storage").map(StorageEvent(_))
+
+      implicit def given_Dom_F: Dom[F] = Dom.forAsync
+
+      def document: HtmlDocument[F] = window.document.asInstanceOf[HtmlDocument[F]]
 
     }
 
