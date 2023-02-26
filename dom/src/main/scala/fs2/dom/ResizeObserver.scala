@@ -24,11 +24,11 @@ import cats.effect.kernel.Sync
 
 abstract class ResizeObserver[F[_]] private {
 
-  def observe(target: dom.Element): F[Unit]
+  def observe(target: Element[F]): F[Unit]
 
-  def observe(target: dom.Element, options: dom.ResizeObserverOptions): F[Unit]
+  def observe(target: Element[F], options: dom.ResizeObserverOptions): F[Unit]
 
-  def unobserve(target: dom.Element): F[Unit]
+  def unobserve(target: Element[F]): F[Unit]
 
   def disconnect: F[Unit]
 
@@ -53,16 +53,16 @@ object ResizeObserver {
       jsObserver: dom.ResizeObserver
   )(implicit F: Sync[F]): ResizeObserver[F] =
     new ResizeObserver[F] {
-      override def observe(target: dom.Element, options: dom.ResizeObserverOptions): F[Unit] =
-        F.delay(jsObserver.observe(target, options))
+      def observe(target: Element[F], options: dom.ResizeObserverOptions): F[Unit] =
+        F.delay(jsObserver.observe(target.asInstanceOf[dom.Element], options))
 
-      override def observe(target: dom.Element): F[Unit] =
-        F.delay(jsObserver.observe(target))
+      def observe(target: Element[F]): F[Unit] =
+        F.delay(jsObserver.observe(target.asInstanceOf[dom.Element]))
 
-      override def unobserve(target: dom.Element): F[Unit] =
-        F.delay(jsObserver.unobserve(target))
+      def unobserve(target: Element[F]): F[Unit] =
+        F.delay(jsObserver.unobserve(target.asInstanceOf[dom.Element]))
 
-      override def disconnect: F[Unit] = F.delay(jsObserver.disconnect())
+      def disconnect: F[Unit] = F.delay(jsObserver.disconnect())
     }
 
 }
