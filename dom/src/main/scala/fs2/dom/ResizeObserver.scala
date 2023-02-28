@@ -22,7 +22,7 @@ import cats.effect.std.Dispatcher
 import cats.effect.kernel.Resource
 import cats.effect.kernel.Sync
 
-abstract class ResizeObserver[F[_]] private {
+abstract class ResizeObserver[F[_]] private[dom] {
 
   def observe(target: Element[F]): F[Unit]
 
