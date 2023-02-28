@@ -37,13 +37,15 @@ abstract class ResizeObserver[F[_]] private[dom] {
 object ResizeObserver {
 
   def apply[F[_]](
-      callback: (List[dom.ResizeObserverEntry], ResizeObserver[F]) => F[Unit]
+      callback: (List[ResizeObserverEntry[F]], ResizeObserver[F]) => F[Unit]
   )(implicit F: Async[F]): Resource[F, ResizeObserver[F]] = for {
     dispatcher <- Dispatcher.parallel[F]
     jsObserver <- Resource.make(
       F.delay(
         new dom.ResizeObserver((a, b) =>
-          dispatcher.unsafeRunAndForget(callback(a.toList, fromJsObserver(b)))
+          dispatcher.unsafeRunAndForget(
+            callback(a.toList.map(ResizeObserverEntry.fromJs(_)), fromJsObserver(b))
+          )
         )
       )
     )(obs => F.delay(obs.disconnect()))
