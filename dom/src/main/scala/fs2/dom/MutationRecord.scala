@@ -28,15 +28,15 @@ abstract class MutationRecord[F[_]] private[dom] {
 
   def removedNodes: List[Node[F]]
 
-  def previousSibling: Node[F]
+  def previousSibling: Option[Node[F]]
 
-  def nextSibling: Node[F]
+  def nextSibling: Option[Node[F]]
 
-  def attributeName: String
+  def attributeName: Option[String]
 
-  def attributeNamespace: String
+  def attributeNamespace: Option[String]
 
-  def oldValue: String
+  def oldValue: Option[String]
 
 }
 
@@ -49,20 +49,25 @@ object MutationRecord {
     override def target: Node[F] = record.target.asInstanceOf[Node[F]]
 
     override def addedNodes: List[Node[F]] =
-      record.addedNodes.toList.map(_.asInstanceOf[Node[F]])
+      record.addedNodes.toList.asInstanceOf[List[Node[F]]]
 
     override def removedNodes: List[Node[F]] =
-      record.removedNodes.toList.map(_.asInstanceOf[Node[F]])
+      record.removedNodes.toList.asInstanceOf[List[Node[F]]]
 
-    override def previousSibling: Node[F] = record.previousSibling.asInstanceOf[Node[F]]
+    override def previousSibling: Option[Node[F]] = Option(
+      record.previousSibling.asInstanceOf[Node[F]]
+    )
 
-    override def nextSibling: Node[F] = record.nextSibling.asInstanceOf[Node[F]]
+    override def nextSibling: Option[Node[F]] =
+      Option(record.nextSibling.asInstanceOf[Node[F]])
 
-    override def attributeName: String = record.attributeName
+    override def attributeName: Option[String] =
+      Option(record.attributeName)
 
-    override def attributeNamespace: String = record.attributeNamespace
+    override def attributeNamespace: Option[String] =
+      Option(record.attributeNamespace)
 
-    override def oldValue: String = record.oldValue
+    override def oldValue: Option[String] = Option(record.oldValue)
 
   }
 
