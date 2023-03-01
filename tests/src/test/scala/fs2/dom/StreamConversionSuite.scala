@@ -22,6 +22,8 @@ import munit.CatsEffectSuite
 import munit.ScalaCheckEffectSuite
 import org.scalacheck.effect.PropF.forAllF
 
+import scala.concurrent.duration._
+
 class StreamConversionSuite extends CatsEffectSuite with ScalaCheckEffectSuite {
 
   test("to/read ReadableStream") {
@@ -36,6 +38,16 @@ class StreamConversionSuite extends CatsEffectSuite with ScalaCheckEffectSuite {
         .toVector
         .assertEquals(chunks.flatten)
     }
+  }
+
+  test("cancelable") {
+    Stream
+      .never[IO]
+      .through(toReadableStream[IO])
+      .flatMap(readable => readReadableStream(IO(readable)))
+      .compile
+      .drain
+      .timeoutTo(100.millis, IO.unit)
   }
 
 }

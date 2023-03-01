@@ -41,7 +41,8 @@ private[dom] object StreamConverters {
       Stream.bracket(F.delay(readableStream.getReader()))(r => F.delay(r.releaseLock())).flatMap {
         reader =>
           Stream.unfoldChunkEval(reader) { reader =>
-            F.fromPromise(F.delay(reader.read())).map { chunk =>
+            // cleanup on cancellation is handled by outer bracket
+            F.fromPromiseCancelable(F.delay((reader.read(), F.unit))).map { chunk =>
               if (chunk.done)
                 None
               else
