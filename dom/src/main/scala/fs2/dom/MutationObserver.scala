@@ -29,7 +29,7 @@ abstract class MutationObserver[F[_]] private[dom] {
 
   def disconnect: F[Unit]
 
-  def takeRecords: F[List[dom.MutationRecord]]
+  def takeRecords: F[List[MutationRecord[F]]]
 
 }
 
@@ -42,13 +42,13 @@ object MutationObserver {
     jsObserver <- Resource.make(
       F.delay(
         new dom.MutationObserver((a, b) =>
-          dispatcher.unsafeRunAndForget(callback(a.toList, fromJsObserver(b)))
+          dispatcher.unsafeRunAndForget(callback(a.toList, fromJS(b)))
         )
       )
     )(obs => F.delay(obs.disconnect()))
-  } yield fromJsObserver(jsObserver)
+  } yield fromJS(jsObserver)
 
-  private def fromJsObserver[F[_]](
+  private def fromJS[F[_]](
       jsObserver: dom.MutationObserver
   )(implicit F: Sync[F]): MutationObserver[F] =
     new MutationObserver[F] {
@@ -58,8 +58,8 @@ object MutationObserver {
 
       def disconnect: F[Unit] = F.delay(jsObserver.disconnect())
 
-      def takeRecords: F[List[dom.MutationRecord]] =
-        F.delay(jsObserver.takeRecords()).map(_.toList)
+      def takeRecords: F[List[MutationRecord[F]]] =
+        F.delay(jsObserver.takeRecords()).map(_.toList.map(MutationRecord.fromJS))
 
     }
 

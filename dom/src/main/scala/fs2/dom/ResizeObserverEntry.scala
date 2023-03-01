@@ -32,7 +32,7 @@ abstract class ResizeObserverEntry[F[_]] private[dom] {
 
 object ResizeObserverEntry {
 
-  private[dom] def fromJs[F[_]](entry: dom.ResizeObserverEntry) = new ResizeObserverEntry[F] {
+  private[dom] def fromJS[F[_]](entry: dom.ResizeObserverEntry) = new ResizeObserverEntry[F] {
 
     def target: Element[F] = entry.target.asInstanceOf[Element[F]]
 

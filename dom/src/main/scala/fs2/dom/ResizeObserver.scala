@@ -44,14 +44,14 @@ object ResizeObserver {
       F.delay(
         new dom.ResizeObserver((a, b) =>
           dispatcher.unsafeRunAndForget(
-            callback(a.toList.map(ResizeObserverEntry.fromJs(_)), fromJsObserver(b))
+            callback(a.toList.map(ResizeObserverEntry.fromJS), fromJS(b))
           )
         )
       )
     )(obs => F.delay(obs.disconnect()))
-  } yield fromJsObserver(jsObserver)
+  } yield fromJS(jsObserver)
 
-  private def fromJsObserver[F[_]](
+  private def fromJS[F[_]](
       jsObserver: dom.ResizeObserver
   )(implicit F: Sync[F]): ResizeObserver[F] =
     new ResizeObserver[F] {
