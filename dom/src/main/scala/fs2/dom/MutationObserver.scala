@@ -16,55 +16,51 @@
 
 package fs2.dom
 
+import cats.syntax.all._
 import org.scalajs.dom
 import cats.effect.kernel.Async
 import cats.effect.std.Dispatcher
 import cats.effect.kernel.Resource
 import cats.effect.kernel.Sync
 
-abstract class ResizeObserver[F[_]] private[dom] {
+abstract class MutationObserver[F[_]] private[dom] {
 
-  def observe(target: Element[F]): F[Unit]
-
-  def observe(target: Element[F], options: dom.ResizeObserverOptions): F[Unit]
-
-  def unobserve(target: Element[F]): F[Unit]
+  def observe(target: Node[F], options: dom.MutationObserverInit): F[Unit]
 
   def disconnect: F[Unit]
 
+  def takeRecords: F[List[MutationRecord[F]]]
+
 }
 
-object ResizeObserver {
+object MutationObserver {
 
   def apply[F[_]](
-      callback: (List[ResizeObserverEntry[F]], ResizeObserver[F]) => F[Unit]
-  )(implicit F: Async[F]): Resource[F, ResizeObserver[F]] = for {
+      callback: (List[dom.MutationRecord], MutationObserver[F]) => F[Unit]
+  )(implicit F: Async[F]): Resource[F, MutationObserver[F]] = for {
     dispatcher <- Dispatcher.parallel[F]
     jsObserver <- Resource.make(
       F.delay(
-        new dom.ResizeObserver((a, b) =>
-          dispatcher.unsafeRunAndForget(
-            callback(a.toList.map(ResizeObserverEntry.fromJS), fromJS(b))
-          )
+        new dom.MutationObserver((a, b) =>
+          dispatcher.unsafeRunAndForget(callback(a.toList, fromJS(b)))
         )
       )
     )(obs => F.delay(obs.disconnect()))
   } yield fromJS(jsObserver)
 
   private def fromJS[F[_]](
-      jsObserver: dom.ResizeObserver
-  )(implicit F: Sync[F]): ResizeObserver[F] =
-    new ResizeObserver[F] {
-      def observe(target: Element[F], options: dom.ResizeObserverOptions): F[Unit] =
-        F.delay(jsObserver.observe(target.asInstanceOf[dom.Element], options))
+      jsObserver: dom.MutationObserver
+  )(implicit F: Sync[F]): MutationObserver[F] =
+    new MutationObserver[F] {
 
-      def observe(target: Element[F]): F[Unit] =
-        F.delay(jsObserver.observe(target.asInstanceOf[dom.Element]))
-
-      def unobserve(target: Element[F]): F[Unit] =
-        F.delay(jsObserver.unobserve(target.asInstanceOf[dom.Element]))
+      def observe(target: Node[F], options: dom.MutationObserverInit): F[Unit] =
+        F.delay(jsObserver.observe(target.asInstanceOf[dom.Node], options))
 
       def disconnect: F[Unit] = F.delay(jsObserver.disconnect())
+
+      def takeRecords: F[List[MutationRecord[F]]] =
+        F.delay(jsObserver.takeRecords()).map(_.toList.map(MutationRecord.fromJS))
+
     }
 
 }
