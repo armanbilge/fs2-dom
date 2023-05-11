@@ -20,6 +20,8 @@ import cats.effect.kernel.Async
 import fs2.Stream
 import org.scalajs.dom
 
+import scala.concurrent.duration._
+
 abstract class Window[F[_]] private {
 
   def history[S: Serializer]: History[F, S]
@@ -37,6 +39,11 @@ abstract class Window[F[_]] private {
   implicit def given_Dom_F: Dom[F]
 
   def document: HtmlDocument[F]
+
+  def requestAnimationFrame: F[FiniteDuration]
+
+  final def animationFrames: Stream[F, FiniteDuration] =
+    Stream.repeatEval(requestAnimationFrame)
 
 }
 
@@ -64,6 +71,15 @@ object Window {
       implicit def given_Dom_F: Dom[F] = Dom.forAsync
 
       def document: HtmlDocument[F] = window.document.asInstanceOf[HtmlDocument[F]]
+
+      def requestAnimationFrame: F[FiniteDuration] = F.async[FiniteDuration] { cb =>
+        F.delay {
+          val id = window.requestAnimationFrame { timestamp =>
+            cb(Right(timestamp.millis))
+          }
+          Some(F.delay(window.cancelAnimationFrame(id)))
+        }
+      }
 
     }
 
