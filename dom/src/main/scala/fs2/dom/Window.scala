@@ -42,9 +42,6 @@ abstract class Window[F[_]] private {
 
   def requestAnimationFrame: F[FiniteDuration]
 
-  final def animationFrames: Stream[F, FiniteDuration] =
-    Stream.repeatEval(requestAnimationFrame)
-
 }
 
 object Window {
