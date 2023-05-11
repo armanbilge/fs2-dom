@@ -112,6 +112,40 @@ object Element {
 }
 
 trait HtmlElement[F[_]] extends Element[F]
+object HtmlElement {
+
+  implicit def ops[F[_]](element: HtmlElement[F]): Ops[F] =
+    new Ops(element.asInstanceOf[dom.HTMLElement])
+
+  final class Ops[F[_]] private[HtmlElement] (private val element: dom.HTMLElement) extends AnyVal {
+    def focus(implicit F: Dom[F]): F[Unit] = F.delay(element.focus())
+
+    // facade for overload missing from org.scalajs.dom
+    def focus(options: FocusOptions)(implicit F: Dom[F]): F[Unit] =
+      F.delay {
+        element.asInstanceOf[js.Dynamic].focus(FocusOptions.toJS(options))
+        ()
+      }
+
+    def blur(implicit F: Dom[F]): F[Unit] = F.delay(element.blur())
+
+    def click(implicit F: Dom[F]): F[Unit] = F.delay(element.click())
+
+    def offsetHeight(implicit F: Dom[F]): F[Double] = F.delay(element.offsetHeight)
+
+    def offsetWidth(implicit F: Dom[F]): F[Double] = F.delay(element.offsetWidth)
+
+    def offsetParent(implicit F: Dom[F]): F[Option[Element[F]]] =
+      F.delay(Option(element.offsetParent))
+
+    def offsetTop(implicit F: Dom[F]): F[Double] = F.delay(element.offsetTop)
+
+    def offsetLeft(implicit F: Dom[F]): F[Double] = F.delay(element.offsetLeft)
+
+    def isContentEditable(implicit F: Dom[F]): F[Boolean] = F.delay(element.isContentEditable)
+  }
+
+}
 
 trait HtmlAnchorElement[F[_]] extends HtmlElement[F]
 object HtmlAnchorElement {

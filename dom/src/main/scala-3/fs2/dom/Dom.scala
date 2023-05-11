@@ -20,6 +20,7 @@ import cats.effect.IO
 import cats.effect.kernel.Async
 import cats.effect.kernel.Ref
 import org.scalajs.dom
+import scala.scalajs.js
 
 opaque type Dom[F[_]] = Async[F]
 object Dom {
@@ -81,6 +82,35 @@ object Element {
 }
 
 opaque type HtmlElement[F[_]] <: Element[F] = dom.HTMLElement
+object HtmlElement {
+  extension [F[_]](element: HtmlElement[F]) {
+    def focus(using F: Dom[F]): F[Unit] = F.delay(element.focus())
+
+    // facade for overload missing from org.scalajs.dom
+    def focus(options: FocusOptions)(using F: Dom[F]): F[Unit] =
+      F.delay {
+        element.asInstanceOf[js.Dynamic].focus(FocusOptions.toJS(options))
+        ()
+      }
+
+    def blur(using F: Dom[F]): F[Unit] = F.delay(element.blur())
+
+    def click(using F: Dom[F]): F[Unit] = F.delay(element.click())
+
+    def offsetHeight(using F: Dom[F]): F[Double] = F.delay(element.offsetHeight)
+
+    def offsetWidth(using F: Dom[F]): F[Double] = F.delay(element.offsetWidth)
+
+    def offsetParent(using F: Dom[F]): F[Option[Element[F]]] = F.delay(Option(element.offsetParent))
+
+    def offsetTop(using F: Dom[F]): F[Double] = F.delay(element.offsetTop)
+
+    def offsetLeft(using F: Dom[F]): F[Double] = F.delay(element.offsetLeft)
+
+    def isContentEditable(using F: Dom[F]): F[Boolean] = F.delay(element.isContentEditable)
+
+  }
+}
 
 opaque type HtmlAnchorElement[F[_]] <: HtmlElement[F] = dom.HTMLAnchorElement
 object HtmlAnchorElement {
