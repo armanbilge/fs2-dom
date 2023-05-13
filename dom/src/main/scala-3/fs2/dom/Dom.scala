@@ -86,12 +86,7 @@ object HtmlElement {
   extension [F[_]](element: HtmlElement[F]) {
     def focus(using F: Dom[F]): F[Unit] = F.delay(element.focus())
 
-    // facade for overload missing from org.scalajs.dom
-    def focus(options: FocusOptions)(using F: Dom[F]): F[Unit] =
-      F.delay {
-        element.asInstanceOf[js.Dynamic].focus(FocusOptions.toJS(options))
-        ()
-      }
+    def focus(options: dom.FocusOptions)(using F: Dom[F]): F[Unit] = F.delay(element.focus(options))
 
     def blur(using F: Dom[F]): F[Unit] = F.delay(element.blur())
 
