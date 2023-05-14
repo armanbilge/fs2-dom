@@ -127,16 +127,16 @@ object HtmlElement {
 
     def click(implicit F: Dom[F]): F[Unit] = F.delay(element.click())
 
-    def offsetHeight(implicit F: Dom[F]): F[Double] = F.delay(element.offsetHeight)
+    def offsetHeight(implicit F: Dom[F]): F[Int] = F.delay(element.offsetHeight.toInt)
 
-    def offsetWidth(implicit F: Dom[F]): F[Double] = F.delay(element.offsetWidth)
+    def offsetWidth(implicit F: Dom[F]): F[Int] = F.delay(element.offsetWidth.toInt)
 
     def offsetParent(implicit F: Dom[F]): F[Option[Element[F]]] =
       F.delay(Option(element.offsetParent))
 
-    def offsetTop(implicit F: Dom[F]): F[Double] = F.delay(element.offsetTop)
+    def offsetTop(implicit F: Dom[F]): F[Int] = F.delay(element.offsetTop.toInt)
 
-    def offsetLeft(implicit F: Dom[F]): F[Double] = F.delay(element.offsetLeft)
+    def offsetLeft(implicit F: Dom[F]): F[Int] = F.delay(element.offsetLeft.toInt)
 
     def isContentEditable(implicit F: Dom[F]): F[Boolean] = F.delay(element.isContentEditable)
   }

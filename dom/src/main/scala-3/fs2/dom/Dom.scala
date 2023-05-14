@@ -92,15 +92,15 @@ object HtmlElement {
 
     def click(using F: Dom[F]): F[Unit] = F.delay(element.click())
 
-    def offsetHeight(using F: Dom[F]): F[Double] = F.delay(element.offsetHeight)
+    def offsetHeight(using F: Dom[F]): F[Int] = F.delay(element.offsetHeight.toInt)
 
-    def offsetWidth(using F: Dom[F]): F[Double] = F.delay(element.offsetWidth)
+    def offsetWidth(using F: Dom[F]): F[Int] = F.delay(element.offsetWidth.toInt)
 
     def offsetParent(using F: Dom[F]): F[Option[Element[F]]] = F.delay(Option(element.offsetParent))
 
-    def offsetTop(using F: Dom[F]): F[Double] = F.delay(element.offsetTop)
+    def offsetTop(using F: Dom[F]): F[Int] = F.delay(element.offsetTop.toInt)
 
-    def offsetLeft(using F: Dom[F]): F[Double] = F.delay(element.offsetLeft)
+    def offsetLeft(using F: Dom[F]): F[Int] = F.delay(element.offsetLeft.toInt)
 
     def isContentEditable(using F: Dom[F]): F[Boolean] = F.delay(element.isContentEditable)
 
