@@ -20,7 +20,6 @@ import cats.effect.IO
 import cats.effect.kernel.Async
 import cats.effect.kernel.Ref
 import org.scalajs.dom
-import scala.scalajs.js
 
 opaque type Dom[F[_]] = Async[F]
 object Dom {
