@@ -112,6 +112,36 @@ object Element {
 }
 
 trait HtmlElement[F[_]] extends Element[F]
+object HtmlElement {
+
+  implicit def ops[F[_]](element: HtmlElement[F]): Ops[F] =
+    new Ops(element.asInstanceOf[dom.HTMLElement])
+
+  final class Ops[F[_]] private[HtmlElement] (private val element: dom.HTMLElement) extends AnyVal {
+    def focus(implicit F: Dom[F]): F[Unit] = F.delay(element.focus())
+
+    def focus(options: dom.FocusOptions)(implicit F: Dom[F]): F[Unit] =
+      F.delay(element.focus(options))
+
+    def blur(implicit F: Dom[F]): F[Unit] = F.delay(element.blur())
+
+    def click(implicit F: Dom[F]): F[Unit] = F.delay(element.click())
+
+    def offsetHeight(implicit F: Dom[F]): F[Int] = F.delay(element.offsetHeight.toInt)
+
+    def offsetWidth(implicit F: Dom[F]): F[Int] = F.delay(element.offsetWidth.toInt)
+
+    def offsetParent(implicit F: Dom[F]): F[Option[Element[F]]] =
+      F.delay(Option(element.offsetParent))
+
+    def offsetTop(implicit F: Dom[F]): F[Int] = F.delay(element.offsetTop.toInt)
+
+    def offsetLeft(implicit F: Dom[F]): F[Int] = F.delay(element.offsetLeft.toInt)
+
+    def isContentEditable(implicit F: Dom[F]): F[Boolean] = F.delay(element.isContentEditable)
+  }
+
+}
 
 trait HtmlAnchorElement[F[_]] extends HtmlElement[F]
 object HtmlAnchorElement {

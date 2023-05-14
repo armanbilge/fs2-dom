@@ -81,6 +81,30 @@ object Element {
 }
 
 opaque type HtmlElement[F[_]] <: Element[F] = dom.HTMLElement
+object HtmlElement {
+  extension [F[_]](element: HtmlElement[F]) {
+    def focus(using F: Dom[F]): F[Unit] = F.delay(element.focus())
+
+    def focus(options: dom.FocusOptions)(using F: Dom[F]): F[Unit] = F.delay(element.focus(options))
+
+    def blur(using F: Dom[F]): F[Unit] = F.delay(element.blur())
+
+    def click(using F: Dom[F]): F[Unit] = F.delay(element.click())
+
+    def offsetHeight(using F: Dom[F]): F[Int] = F.delay(element.offsetHeight.toInt)
+
+    def offsetWidth(using F: Dom[F]): F[Int] = F.delay(element.offsetWidth.toInt)
+
+    def offsetParent(using F: Dom[F]): F[Option[Element[F]]] = F.delay(Option(element.offsetParent))
+
+    def offsetTop(using F: Dom[F]): F[Int] = F.delay(element.offsetTop.toInt)
+
+    def offsetLeft(using F: Dom[F]): F[Int] = F.delay(element.offsetLeft.toInt)
+
+    def isContentEditable(using F: Dom[F]): F[Boolean] = F.delay(element.isContentEditable)
+
+  }
+}
 
 opaque type HtmlAnchorElement[F[_]] <: HtmlElement[F] = dom.HTMLAnchorElement
 object HtmlAnchorElement {
