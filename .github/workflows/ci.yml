@@ -158,12 +158,12 @@ jobs:
           tar xf targets.tar
           rm targets.tar
 
-      - name: Download target directories (3.2.2, rootNodeJS)
+      - name: Download target directories (3.3.0, rootNodeJS)
         uses: actions/download-artifact@v3
         with:
-          name: target-${{ matrix.os }}-${{ matrix.java }}-3.2.2-rootNodeJS
+          name: target-${{ matrix.os }}-${{ matrix.java }}-3.3.0-rootNodeJS
 
-      - name: Inflate target directories (3.2.2, rootNodeJS)
+      - name: Inflate target directories (3.3.0, rootNodeJS)
         run: |
           tar xf targets.tar
           rm targets.tar
