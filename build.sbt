@@ -25,7 +25,7 @@ ThisBuild / githubWorkflowBuildPreamble +=
     cond = Some("matrix.project == 'rootNodeJS'")
   )
 
-val ceVersion = "3.5.0"
+val ceVersion = "3.5.1"
 val fs2Version = "3.7.0"
 val sjsDomVersion = "2.6.0"
 val munitCEVersion = "2.0.0-M3"
