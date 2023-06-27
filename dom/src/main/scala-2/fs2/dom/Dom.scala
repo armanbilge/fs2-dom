@@ -44,10 +44,10 @@ object Node {
   final class Ops[F[_]] private[Node] (private val node: dom.Node) extends AnyVal {
 
     def firstChild(implicit F: Dom[F]): F[Option[Node[F]]] =
-      F.delay(Option(node.firstChild))
+      F.delay(Option(fromJS(node.firstChild)))
 
     def parentNode(implicit F: Dom[F]): F[Option[Node[F]]] =
-      F.delay(Option(node.parentNode))
+      F.delay(Option(fromJS(node.parentNode)))
 
     def appendChild(child: Node[F])(implicit F: Dom[F]): F[Unit] = F.delay {
       node.appendChild(child)
@@ -84,7 +84,7 @@ object Document {
       F.delay(document.createElement(tagName))
 
     def getElementById(id: String)(implicit F: Dom[F]): F[Option[Element[F]]] =
-      F.delay(Option(document.getElementById(id)))
+      F.delay(Option(Element.fromJS(document.getElementById(id))))
 
   }
 }
@@ -132,7 +132,7 @@ object HtmlElement {
     def offsetWidth(implicit F: Dom[F]): F[Int] = F.delay(element.offsetWidth.toInt)
 
     def offsetParent(implicit F: Dom[F]): F[Option[Element[F]]] =
-      F.delay(Option(element.offsetParent))
+      F.delay(Option(Element.fromJS(element.offsetParent)))
 
     def offsetTop(implicit F: Dom[F]): F[Int] = F.delay(element.offsetTop.toInt)
 

@@ -11,10 +11,9 @@ ThisBuild / crossScalaVersions := Seq(scala213, "3.3.0")
 ThisBuild / scalaVersion := scala213
 
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
-ThisBuild / tlJdkRelease := Some(8)
 
 ThisBuild / githubWorkflowBuildMatrixAdditions +=
-  "project" -> List("rootNodeJS", "rootChrome", "rootFirefox")
+  "project" -> List("rootChrome", "rootFirefox", "rootNodeJS")
 ThisBuild / githubWorkflowBuildSbtStepPreamble += s"project $${{ matrix.project }}"
 
 ThisBuild / githubWorkflowBuildPreamble +=
