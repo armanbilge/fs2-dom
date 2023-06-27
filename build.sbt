@@ -7,14 +7,13 @@ ThisBuild / startYear := Some(2022)
 ThisBuild / tlSonatypeUseLegacyHost := false
 
 val scala213 = "2.13.10"
-ThisBuild / crossScalaVersions := Seq(scala213, "3.2.2")
+ThisBuild / crossScalaVersions := Seq(scala213, "3.3.0")
 ThisBuild / scalaVersion := scala213
 
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
-ThisBuild / tlJdkRelease := Some(8)
 
 ThisBuild / githubWorkflowBuildMatrixAdditions +=
-  "project" -> List("rootNodeJS", "rootChrome", "rootFirefox")
+  "project" -> List("rootChrome", "rootFirefox", "rootNodeJS")
 ThisBuild / githubWorkflowBuildSbtStepPreamble += s"project $${{ matrix.project }}"
 
 ThisBuild / githubWorkflowBuildPreamble +=
@@ -25,7 +24,7 @@ ThisBuild / githubWorkflowBuildPreamble +=
     cond = Some("matrix.project == 'rootNodeJS'")
   )
 
-val ceVersion = "3.5.0"
+val ceVersion = "3.5.1"
 val fs2Version = "3.7.0"
 val sjsDomVersion = "2.6.0"
 val munitCEVersion = "2.0.0-M3"
