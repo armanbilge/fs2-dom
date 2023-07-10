@@ -193,5 +193,5 @@ jobs:
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2
         with:
-          modules-ignore: testsChrome_sjs1_2.13 testsChrome_sjs1_3 rootNodeJS_2.13 rootNodeJS_3 root_2.13 root_3 rootChrome_2.13 rootChrome_3 rootFirefox_2.13 rootFirefox_3 testsFirefox_sjs1_2.13 testsFirefox_sjs1_3 testsNodeJS_sjs1_2.13 testsNodeJS_sjs1_3
+          modules-ignore: testschrome_sjs1_2.13 testschrome_sjs1_3 rootnodejs_2.13 rootnodejs_3 root_2.13 root_3 rootchrome_2.13 rootchrome_3 rootfirefox_2.13 rootfirefox_3 testsfirefox_sjs1_2.13 testsfirefox_sjs1_3 testsnodejs_sjs1_2.13 testsnodejs_sjs1_3
           configs-ignore: test scala-tool scala-doc-tool test-internal
