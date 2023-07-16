@@ -57,11 +57,9 @@ lazy val dom = project
     mimaBinaryIssueFilters ++= {
       import com.typesafe.tools.mima.core.ProblemFilters._
       import com.typesafe.tools.mima.core._
-      if (tlIsScala3.value)
-        Seq(
-          ProblemFilters.exclude[ReversedMissingMethodProblem]("fs2.dom.Window.domContentLoaded")
-        )
-      else Nil
+      Seq(
+        ProblemFilters.exclude[ReversedMissingMethodProblem]("fs2.dom.Window.domContentLoaded")
+      )
     }
   )
 
