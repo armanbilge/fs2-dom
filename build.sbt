@@ -53,7 +53,16 @@ lazy val dom = project
       "org.typelevel" %%% "cats-effect" % ceVersion,
       "co.fs2" %%% "fs2-core" % fs2Version,
       "org.scala-js" %%% "scalajs-dom" % sjsDomVersion
-    )
+    ),
+    mimaBinaryIssueFilters ++= {
+      import com.typesafe.tools.mima.core.ProblemFilters._
+      import com.typesafe.tools.mima.core._
+      if (tlIsScala3.value)
+        Seq(
+          ProblemFilters.exclude[ReversedMissingMethodProblem]("fs2.dom.Window.domContentLoaded")
+        )
+      else Nil
+    }
   )
 
 import org.openqa.selenium.WebDriver
