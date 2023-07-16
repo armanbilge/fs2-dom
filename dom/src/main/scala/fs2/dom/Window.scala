@@ -16,6 +16,7 @@
 
 package fs2.dom
 
+import cats.syntax.all._
 import cats.effect.kernel.Async
 import fs2.Stream
 import org.scalajs.dom
@@ -41,6 +42,8 @@ abstract class Window[F[_]] private {
   def document: HtmlDocument[F]
 
   def requestAnimationFrame: F[FiniteDuration]
+
+  def domContentLoaded: F[Unit]
 
 }
 
@@ -68,6 +71,19 @@ object Window {
       implicit def given_Dom_F: Dom[F] = Dom.forAsync
 
       def document: HtmlDocument[F] = window.document.asInstanceOf[HtmlDocument[F]]
+
+      def domContentLoaded: F[Unit] = F.async_[Unit] { cb =>
+        // This _must_ happen in the same thunk because the event might fire before we can register an
+        // event handler
+        val document = window.document
+        if (document == dom.DocumentReadyState.loading) {
+          window.addEventListener("DOMContentLoaded", _ => cb(Either.unit), new dom.EventListenerOptions {
+            once = true
+          })
+        } else {
+          cb(Either.unit)
+        }
+      }
 
       def requestAnimationFrame: F[FiniteDuration] = F.async[FiniteDuration] { cb =>
         F.delay {
