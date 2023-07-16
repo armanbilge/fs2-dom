@@ -24,7 +24,9 @@ class WindowSuite extends CatsEffectSuite {
   val window = Window[IO]
 
   test("domContentLoaded") {
-    (window.domContentLoaded *> window.document.readyState).map(dom.DocumentReadyState.loading != _).assert
+    (window.domContentLoaded *> window.document.readyState)
+      .map(dom.DocumentReadyState.loading != _)
+      .assert
   }
 
 }
