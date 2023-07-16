@@ -47,9 +47,7 @@ object Node {
       ()
     }
 
-    def replaceChild(newChild: Node[F], oldChild: Node[F])(using
-        F: Dom[F]
-    ): F[Unit] = F.delay {
+    def replaceChild(newChild: Node[F], oldChild: Node[F])(using F: Dom[F]): F[Unit] = F.delay {
       node.replaceChild(newChild, oldChild)
       ()
     }
@@ -93,28 +91,23 @@ object HtmlElement {
   extension [F[_]](element: HtmlElement[F]) {
     def focus(using F: Dom[F]): F[Unit] = F.delay(element.focus())
 
-    def focus(options: dom.FocusOptions)(using F: Dom[F]): F[Unit] =
-      F.delay(element.focus(options))
+    def focus(options: dom.FocusOptions)(using F: Dom[F]): F[Unit] = F.delay(element.focus(options))
 
     def blur(using F: Dom[F]): F[Unit] = F.delay(element.blur())
 
     def click(using F: Dom[F]): F[Unit] = F.delay(element.click())
 
-    def offsetHeight(using F: Dom[F]): F[Int] =
-      F.delay(element.offsetHeight.toInt)
+    def offsetHeight(using F: Dom[F]): F[Int] = F.delay(element.offsetHeight.toInt)
 
-    def offsetWidth(using F: Dom[F]): F[Int] =
-      F.delay(element.offsetWidth.toInt)
+    def offsetWidth(using F: Dom[F]): F[Int] = F.delay(element.offsetWidth.toInt)
 
-    def offsetParent(using F: Dom[F]): F[Option[Element[F]]] =
-      F.delay(Option(element.offsetParent))
+    def offsetParent(using F: Dom[F]): F[Option[Element[F]]] = F.delay(Option(element.offsetParent))
 
     def offsetTop(using F: Dom[F]): F[Int] = F.delay(element.offsetTop.toInt)
 
     def offsetLeft(using F: Dom[F]): F[Int] = F.delay(element.offsetLeft.toInt)
 
-    def isContentEditable(using F: Dom[F]): F[Boolean] =
-      F.delay(element.isContentEditable)
+    def isContentEditable(using F: Dom[F]): F[Boolean] = F.delay(element.isContentEditable)
 
   }
 }
@@ -142,13 +135,11 @@ object HtmlButtonElement {
 
 opaque type HtmlBrElement[F[_]] <: HtmlElement[F] = dom.HTMLBRElement
 opaque type HtmlCanvasElement[F[_]] <: HtmlElement[F] = dom.HTMLCanvasElement
-opaque type HtmlDataListElement[F[_]] <: HtmlElement[F] =
-  dom.HTMLDataListElement
+opaque type HtmlDataListElement[F[_]] <: HtmlElement[F] = dom.HTMLDataListElement
 opaque type HtmlDivElement[F[_]] <: HtmlElement[F] = dom.HTMLDivElement
 opaque type HtmlDListElement[F[_]] <: HtmlElement[F] = dom.HTMLDListElement
 opaque type HtmlEmbedElement[F[_]] <: HtmlElement[F] = dom.HTMLEmbedElement
-opaque type HtmlFieldSetElement[F[_]] <: HtmlElement[F] =
-  dom.HTMLFieldSetElement
+opaque type HtmlFieldSetElement[F[_]] <: HtmlElement[F] = dom.HTMLFieldSetElement
 opaque type HtmlFormElement[F[_]] <: HtmlElement[F] = dom.HTMLFormElement
 opaque type HtmlHeadElement[F[_]] <: HtmlElement[F] = dom.HTMLHeadElement
 opaque type HtmlHeadingElement[F[_]] <: HtmlElement[F] = dom.HTMLHeadingElement
@@ -178,8 +169,7 @@ opaque type HtmlMetaElement[F[_]] <: HtmlElement[F] = dom.HTMLMetaElement
 opaque type HtmlModElement[F[_]] <: HtmlElement[F] = dom.HTMLModElement
 opaque type HtmlObjectElement[F[_]] <: HtmlElement[F] = dom.HTMLObjectElement
 opaque type HtmlOListElement[F[_]] <: HtmlElement[F] = dom.HTMLOListElement
-opaque type HtmlOptGroupElement[F[_]] <: HtmlElement[F] =
-  dom.HTMLOptGroupElement
+opaque type HtmlOptGroupElement[F[_]] <: HtmlElement[F] = dom.HTMLOptGroupElement
 
 opaque type HtmlOptionElement[F[_]] <: HtmlElement[F] = dom.HTMLOptionElement
 object HtmlOptionElement {
@@ -189,12 +179,10 @@ object HtmlOptionElement {
   }
 }
 
-opaque type HtmlParagraphElement[F[_]] <: HtmlElement[F] =
-  dom.HTMLParagraphElement
+opaque type HtmlParagraphElement[F[_]] <: HtmlElement[F] = dom.HTMLParagraphElement
 opaque type HtmlParamElement[F[_]] <: HtmlElement[F] = dom.HTMLParamElement
 opaque type HtmlPreElement[F[_]] <: HtmlElement[F] = dom.HTMLPreElement
-opaque type HtmlProgressElement[F[_]] <: HtmlElement[F] =
-  dom.HTMLProgressElement
+opaque type HtmlProgressElement[F[_]] <: HtmlElement[F] = dom.HTMLProgressElement
 opaque type HtmlQuoteElement[F[_]] <: HtmlElement[F] = dom.HTMLQuoteElement
 opaque type HtmlScriptElement[F[_]] <: HtmlElement[F] = dom.HTMLScriptElement
 
@@ -210,19 +198,13 @@ opaque type HtmlSourceElement[F[_]] <: HtmlElement[F] = dom.HTMLSourceElement
 opaque type HtmlSpanElement[F[_]] <: HtmlElement[F] = dom.HTMLSpanElement
 opaque type HtmlStyleElement[F[_]] <: HtmlElement[F] = dom.HTMLStyleElement
 opaque type HtmlTableElement[F[_]] <: HtmlElement[F] = dom.HTMLTableElement
-opaque type HtmlTableCaptionElement[F[_]] <: HtmlElement[F] =
-  dom.HTMLTableCaptionElement
-opaque type HtmlTableCellElement[F[_]] <: HtmlElement[F] =
-  dom.HTMLTableCellElement
-opaque type HtmlTableColElement[F[_]] <: HtmlElement[F] =
-  dom.HTMLTableColElement
-opaque type HtmlTableRowElement[F[_]] <: HtmlElement[F] =
-  dom.HTMLTableRowElement
-opaque type HtmlTableSectionElement[F[_]] <: HtmlElement[F] =
-  dom.HTMLTableSectionElement
+opaque type HtmlTableCaptionElement[F[_]] <: HtmlElement[F] = dom.HTMLTableCaptionElement
+opaque type HtmlTableCellElement[F[_]] <: HtmlElement[F] = dom.HTMLTableCellElement
+opaque type HtmlTableColElement[F[_]] <: HtmlElement[F] = dom.HTMLTableColElement
+opaque type HtmlTableRowElement[F[_]] <: HtmlElement[F] = dom.HTMLTableRowElement
+opaque type HtmlTableSectionElement[F[_]] <: HtmlElement[F] = dom.HTMLTableSectionElement
 
-opaque type HtmlTextAreaElement[F[_]] <: HtmlElement[F] =
-  dom.HTMLTextAreaElement
+opaque type HtmlTextAreaElement[F[_]] <: HtmlElement[F] = dom.HTMLTextAreaElement
 object HtmlTextAreaElement {
   extension [F[_]](textArea: HtmlTextAreaElement[F]) {
     def value(using Dom[F]): Ref[F, String] =
