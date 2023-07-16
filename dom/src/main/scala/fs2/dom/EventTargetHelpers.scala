@@ -24,10 +24,9 @@ private[dom] object EventTargetHelpers {
 
   def listen[F[_], E <: dom.Event](target: dom.EventTarget, `type`: String)(implicit
       F: Async[F]
-  ): Stream[F, E] =
-    Stream.repeatEval(listen1(target, `type`))
+  ): Stream[F, E] = Stream.repeatEval(listenOnce(target, `type`))
 
-  def listen1[F[_], E <: dom.Event](target: dom.EventTarget, `type`: String)(implicit
+  def listenOnce[F[_], E <: dom.Event](target: dom.EventTarget, `type`: String)(implicit
       F: Async[F]
   ): F[E] =
     F.async[E] { cb =>
