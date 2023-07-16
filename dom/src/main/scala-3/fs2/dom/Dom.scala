@@ -68,6 +68,12 @@ object Document {
 }
 
 opaque type HtmlDocument[F[_]] <: Document[F] = dom.HTMLDocument
+object HtmlDocument {
+  extension [F[_]](document: HtmlDocument[F]) {
+    def readyState(using F: Dom[F]): F[dom.DocumentReadyState] =
+      F.delay(document.readyState)
+  }
+}
 
 opaque type Element[F[_]] <: Node[F] = dom.Element
 object Element {
