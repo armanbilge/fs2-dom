@@ -70,8 +70,7 @@ object Window {
 
       implicit def given_Dom_F: Dom[F] = Dom.forAsync
 
-      def document: HtmlDocument[F] =
-        window.document.asInstanceOf[HtmlDocument[F]]
+      def document: HtmlDocument[F] = window.document.asInstanceOf[HtmlDocument[F]]
 
       def domContentLoaded: F[Unit] =
         F.asyncCheckAttempt { cb =>
