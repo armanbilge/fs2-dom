@@ -77,7 +77,7 @@ object Window {
         // This _must_ happen in the same thunk because the event might fire before we can register an
         // event handler
         val document = window.document
-        if (document == dom.DocumentReadyState.loading) {
+        if (document.readyState == dom.DocumentReadyState.loading) {
           window.addEventListener(
             "DOMContentLoaded",
             _ => cb(Either.unit),
