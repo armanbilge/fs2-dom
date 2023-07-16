@@ -45,6 +45,8 @@ abstract class Window[F[_]] private {
 
   def domContentLoaded: F[Unit]
 
+  def asyncDomContentLoaded: F[Unit]
+
 }
 
 object Window {
@@ -73,22 +75,16 @@ object Window {
       def document: HtmlDocument[F] =
         window.document.asInstanceOf[HtmlDocument[F]]
 
-      def domContentLoaded: F[Unit] = F.async_[Unit] { cb =>
-        // This _must_ happen in the same thunk because the event might fire before we can register an
-        // event handler
-        val document = window.document
-        if (document.readyState == dom.DocumentReadyState.loading) {
-          window.addEventListener(
-            "DOMContentLoaded",
-            _ => cb(Either.unit),
-            new dom.EventListenerOptions {
-              once = true
-            }
-          )
-        } else {
-          cb(Either.unit)
+      def asyncDomContentLoaded: F[Unit] =
+        EventTargetHelpers
+          .listen1[F, dom.Event](window.asInstanceOf[dom.Window], "DOMContentLoaded")
+          .void
+
+      def domContentLoaded: F[Unit] =
+        document.readyState.flatMap {
+          case dom.DocumentReadyState.loading => asyncDomContentLoaded
+          case _                              => F.unit
         }
-      }
 
       def requestAnimationFrame: F[FiniteDuration] = F.async[FiniteDuration] { cb =>
         F.delay {

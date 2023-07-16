@@ -25,21 +25,23 @@ private[dom] object EventTargetHelpers {
   def listen[F[_], E <: dom.Event](target: dom.EventTarget, `type`: String)(implicit
       F: Async[F]
   ): Stream[F, E] =
-    Stream.repeatEval {
-      F.async[E] { cb =>
-        F.delay {
-          val ctrl = new dom.AbortController
-          target.addEventListener[E](
-            `type`,
-            (e: E) => cb(Right(e)),
-            new dom.EventListenerOptions {
-              once = true
-              signal = ctrl.signal
-            }
-          )
-          Some(F.delay(ctrl.abort()))
-        }
+    Stream.repeatEval(listen1(target, `type`))
+
+  def listen1[F[_], E <: dom.Event](target: dom.EventTarget, `type`: String)(implicit
+      F: Async[F]
+  ): F[E] =
+    F.async[E] { cb =>
+      F.delay {
+        val ctrl = new dom.AbortController
+        target.addEventListener[E](
+          `type`,
+          (e: E) => cb(Right(e)),
+          new dom.EventListenerOptions {
+            once = true
+            signal = ctrl.signal
+          }
+        )
+        Some(F.delay(ctrl.abort()))
       }
     }
-
 }

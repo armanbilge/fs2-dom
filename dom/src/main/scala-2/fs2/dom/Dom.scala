@@ -90,6 +90,23 @@ object Document {
 }
 
 trait HtmlDocument[F[_]] extends Document[F]
+object HtmlDocument {
+
+  implicit def ops[F[_]](element: HtmlDocument[F]): Ops[F] = new Ops(
+    element.asInstanceOf[dom.HTMLDocument]
+  )
+
+  private implicit def toJS[F[_]](element: HtmlDocument[F]): dom.HTMLDocument =
+    element.asInstanceOf[dom.HTMLDocument]
+  private[dom] implicit def fromJS[F[_]](element: dom.HTMLDocument): HtmlDocument[F] =
+    element.asInstanceOf[HtmlDocument[F]]
+
+  final class Ops[F[_]] private[HtmlDocument] (private val document: HtmlDocument[F])
+      extends AnyVal {
+    def readyState(implicit F: Dom[F]): F[dom.DocumentReadyState] =
+      F.delay(toJS(document).readyState)
+  }
+}
 
 trait Element[F[_]] extends Node[F]
 object Element {
