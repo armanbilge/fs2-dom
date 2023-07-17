@@ -21,11 +21,10 @@ import cats.effect.kernel.Async
 import cats.effect.kernel.Ref
 import org.scalajs.dom
 
-import scala.scalajs.js.annotation._
 import scala.scalajs.js
 import js.annotation._
 
-trait Dom[F[_]] extends js.Any
+sealed trait Dom[F[_]] extends js.Any
 object Dom {
   @inline implicit def forIO: Dom[IO] = IO.asyncForIO.asInstanceOf[Dom[IO]]
   @inline def forAsync[F[_]](implicit F: Async[F]): Dom[F] = F.asInstanceOf[Dom[F]]
@@ -37,7 +36,7 @@ object Dom {
 
 @JSGlobal
 @js.native
-class Node[F[_]] extends js.Any
+class Node[F[_]] protected () extends js.Any
 object Node {
 
   implicit def ops[F[_]](node: Node[F]): Ops[F] = new Ops(node.asInstanceOf[dom.Node])
@@ -72,7 +71,7 @@ object Node {
 
 @JSGlobal
 @js.native
-class Document[F[_]] extends Node[F]
+class Document[F[_]] protected () extends Node[F]
 object Document {
 
   implicit def ops[F[_]](document: Document[F]): Ops[F] = new Ops(
@@ -97,7 +96,7 @@ object Document {
 
 @JSGlobal("HTMLDocument")
 @js.native
-class HtmlDocument[F[_]] extends Document[F]
+class HtmlDocument[F[_]] protected () extends Document[F]
 object HtmlDocument {
 
   implicit def ops[F[_]](element: HtmlDocument[F]): Ops[F] = new Ops(
@@ -118,7 +117,7 @@ object HtmlDocument {
 
 @JSGlobal
 @js.native
-class Element[F[_]] extends Node[F]
+class Element[F[_]] protected () extends Node[F]
 object Element {
   implicit def ops[F[_]](element: Element[F]): Ops[F] = new Ops(element.asInstanceOf[dom.Element])
 
@@ -140,7 +139,7 @@ object Element {
 
 @JSGlobal("HTMLElement")
 @js.native
-class HtmlElement[F[_]] extends Element[F]
+class HtmlElement[F[_]] protected () extends Element[F]
 object HtmlElement {
 
   implicit def ops[F[_]](element: HtmlElement[F]): Ops[F] =
@@ -174,7 +173,7 @@ object HtmlElement {
 
 @JSGlobal("HTMLAnchorElement")
 @js.native
-class HtmlAnchorElement[F[_]] extends HtmlElement[F]
+class HtmlAnchorElement[F[_]] protected () extends HtmlElement[F]
 object HtmlAnchorElement {
   implicit def ops[F[_]](element: HtmlAnchorElement[F]): Ops[F] =
     new Ops(element.asInstanceOf[dom.HTMLAnchorElement])
@@ -188,22 +187,22 @@ object HtmlAnchorElement {
 
 @JSGlobal("HTMLAreaElement")
 @js.native
-class HtmlAreaElement[F[_]] extends HtmlElement[F]
+class HtmlAreaElement[F[_]] protected () extends HtmlElement[F]
 
 @JSGlobal("HTMLAudioElement")
 @js.native
-class HtmlAudioElement[F[_]] extends HtmlElement[F]
+class HtmlAudioElement[F[_]] protected () extends HtmlElement[F]
 
 @JSGlobal("HTMLBaseElement")
 @js.native
-class HtmlBaseElement[F[_]] extends HtmlElement[F]
+class HtmlBaseElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLBodyElement")
 @js.native
-class HtmlBodyElement[F[_]] extends HtmlElement[F]
+class HtmlBodyElement[F[_]] protected () extends HtmlElement[F]
 
 @JSGlobal("HTMLButtonElement")
 @js.native
-class HtmlButtonElement[F[_]] extends HtmlElement[F]
+class HtmlButtonElement[F[_]] protected () extends HtmlElement[F]
 object HtmlButtonElement {
   implicit def ops[F[_]](element: HtmlButtonElement[F]): Ops[F] =
     new Ops(element.asInstanceOf[dom.HTMLButtonElement])
@@ -217,50 +216,50 @@ object HtmlButtonElement {
 
 @JSGlobal("HTMLBrElement")
 @js.native
-class HtmlBrElement[F[_]] extends HtmlElement[F]
+class HtmlBrElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLCanvasElement")
 @js.native
-class HtmlCanvasElement[F[_]] extends HtmlElement[F]
+class HtmlCanvasElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLDataListElement")
 @js.native
-class HtmlDataListElement[F[_]] extends HtmlElement[F]
+class HtmlDataListElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLDivElement")
 @js.native
-class HtmlDivElement[F[_]] extends HtmlElement[F]
+class HtmlDivElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLDListElement")
 @js.native
-class HtmlDListElement[F[_]] extends HtmlElement[F]
+class HtmlDListElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLEmbedElement")
 @js.native
-class HtmlEmbedElement[F[_]] extends HtmlElement[F]
+class HtmlEmbedElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLFieldSetElement")
 @js.native
-class HtmlFieldSetElement[F[_]] extends HtmlElement[F]
+class HtmlFieldSetElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLFormElement")
 @js.native
-class HtmlFormElement[F[_]] extends HtmlElement[F]
+class HtmlFormElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLHeadElement")
 @js.native
-class HtmlHeadElement[F[_]] extends HtmlElement[F]
+class HtmlHeadElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLHeadingElement")
 @js.native
-class HtmlHeadingElement[F[_]] extends HtmlElement[F]
+class HtmlHeadingElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLHrElement")
 @js.native
-class HtmlHrElement[F[_]] extends HtmlElement[F]
+class HtmlHrElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLHTMLElement")
 @js.native
-class HtmlHtmlElement[F[_]] extends HtmlElement[F]
+class HtmlHtmlElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLIFrameElement")
 @js.native
-class HtmlIFrameElement[F[_]] extends HtmlElement[F]
+class HtmlIFrameElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLImageElement")
 @js.native
-class HtmlImageElement[F[_]] extends HtmlElement[F]
+class HtmlImageElement[F[_]] protected () extends HtmlElement[F]
 
 @JSGlobal("HTMLInputElement")
 @js.native
-class HtmlInputElement[F[_]] extends HtmlElement[F]
+class HtmlInputElement[F[_]] protected () extends HtmlElement[F]
 object HtmlInputElement {
   implicit def ops[F[_]](element: HtmlInputElement[F]): Ops[F] =
     new Ops(element.asInstanceOf[dom.HTMLInputElement])
@@ -277,41 +276,41 @@ object HtmlInputElement {
 
 @JSGlobal("HTMLLinkElement")
 @js.native
-class HtmlLinkElement[F[_]] extends HtmlElement[F]
+class HtmlLinkElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLLabelElement")
 @js.native
-class HtmlLabelElement[F[_]] extends HtmlElement[F]
+class HtmlLabelElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLLegendElement")
 @js.native
-class HtmlLegendElement[F[_]] extends HtmlElement[F]
+class HtmlLegendElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLLiElement")
 @js.native
-class HtmlLiElement[F[_]] extends HtmlElement[F]
+class HtmlLiElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLMapElement")
 @js.native
-class HtmlMapElement[F[_]] extends HtmlElement[F]
+class HtmlMapElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLMenuElement")
 @js.native
-class HtmlMenuElement[F[_]] extends HtmlElement[F]
+class HtmlMenuElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLMetaElement")
 @js.native
-class HtmlMetaElement[F[_]] extends HtmlElement[F]
+class HtmlMetaElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLModElement")
 @js.native
-class HtmlModElement[F[_]] extends HtmlElement[F]
+class HtmlModElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLObjectElement")
 @js.native
-class HtmlObjectElement[F[_]] extends HtmlElement[F]
+class HtmlObjectElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLOListElement")
 @js.native
-class HtmlOListElement[F[_]] extends HtmlElement[F]
+class HtmlOListElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLOptGroupElement")
 @js.native
-class HtmlOptGroupElement[F[_]] extends HtmlElement[F]
+class HtmlOptGroupElement[F[_]] protected () extends HtmlElement[F]
 
 @JSGlobal("HTMLOptionElement")
 @js.native
-class HtmlOptionElement[F[_]] extends HtmlElement[F]
+class HtmlOptionElement[F[_]] protected () extends HtmlElement[F]
 object HtmlOptionElement {
   implicit def ops[F[_]](element: HtmlOptionElement[F]): Ops[F] =
     new Ops(element.asInstanceOf[dom.HTMLOptionElement])
@@ -325,26 +324,26 @@ object HtmlOptionElement {
 
 @JSGlobal("HTMLParagraphElement")
 @js.native
-class HtmlParagraphElement[F[_]] extends HtmlElement[F]
+class HtmlParagraphElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLParamElement")
 @js.native
-class HtmlParamElement[F[_]] extends HtmlElement[F]
+class HtmlParamElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLPreElement")
 @js.native
-class HtmlPreElement[F[_]] extends HtmlElement[F]
+class HtmlPreElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLProgressElement")
 @js.native
-class HtmlProgressElement[F[_]] extends HtmlElement[F]
+class HtmlProgressElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLQuoteElement")
 @js.native
-class HtmlQuoteElement[F[_]] extends HtmlElement[F]
+class HtmlQuoteElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLScriptElement")
 @js.native
-class HtmlScriptElement[F[_]] extends HtmlElement[F]
+class HtmlScriptElement[F[_]] protected () extends HtmlElement[F]
 
 @JSGlobal("HTMLSelectElement")
 @js.native
-class HtmlSelectElement[F[_]] extends HtmlElement[F]
+class HtmlSelectElement[F[_]] protected () extends HtmlElement[F]
 object HtmlSelectElement {
   implicit def ops[F[_]](element: HtmlSelectElement[F]): Ops[F] =
     new Ops(element.asInstanceOf[dom.HTMLSelectElement])
@@ -358,35 +357,35 @@ object HtmlSelectElement {
 
 @JSGlobal("HTMLSourceElement")
 @js.native
-class HtmlSourceElement[F[_]] extends HtmlElement[F]
+class HtmlSourceElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLSpanElement")
 @js.native
-class HtmlSpanElement[F[_]] extends HtmlElement[F]
+class HtmlSpanElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLStyleElement")
 @js.native
-class HtmlStyleElement[F[_]] extends HtmlElement[F]
+class HtmlStyleElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLTableElement")
 @js.native
-class HtmlTableElement[F[_]] extends HtmlElement[F]
+class HtmlTableElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLTableCaptionElement")
 @js.native
-class HtmlTableCaptionElement[F[_]] extends HtmlElement[F]
+class HtmlTableCaptionElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLTableCellElement")
 @js.native
-class HtmlTableCellElement[F[_]] extends HtmlElement[F]
+class HtmlTableCellElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLTableColElement")
 @js.native
-class HtmlTableColElement[F[_]] extends HtmlElement[F]
+class HtmlTableColElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLTableRowElement")
 @js.native
-class HtmlTableRowElement[F[_]] extends HtmlElement[F]
+class HtmlTableRowElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLTableSectionElement")
 @js.native
-class HtmlTableSectionElement[F[_]] extends HtmlElement[F]
+class HtmlTableSectionElement[F[_]] protected () extends HtmlElement[F]
 
 @JSGlobal("HTMLTextAreaElement")
 @js.native
-class HtmlTextAreaElement[F[_]] extends HtmlElement[F]
+class HtmlTextAreaElement[F[_]] protected () extends HtmlElement[F]
 object HtmlTextAreaElement {
   implicit def ops[F[_]](element: HtmlTextAreaElement[F]): Ops[F] =
     new Ops(element.asInstanceOf[dom.HTMLTextAreaElement])
@@ -400,16 +399,16 @@ object HtmlTextAreaElement {
 
 @JSGlobal("HTMLTitleElement")
 @js.native
-class HtmlTitleElement[F[_]] extends HtmlElement[F]
+class HtmlTitleElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLTrackElement")
 @js.native
-class HtmlTrackElement[F[_]] extends HtmlElement[F]
+class HtmlTrackElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLUListElement")
 @js.native
-class HtmlUListElement[F[_]] extends HtmlElement[F]
+class HtmlUListElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLVideoElement")
 @js.native
-class HtmlVideoElement[F[_]] extends HtmlElement[F]
+class HtmlVideoElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLDialogElement")
 @js.native
-class HtmlDialogElement[F[_]] extends HtmlElement[F]
+class HtmlDialogElement[F[_]] protected () extends HtmlElement[F]
