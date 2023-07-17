@@ -21,6 +21,7 @@ import cats.effect.kernel.Async
 import cats.effect.kernel.Ref
 import org.scalajs.dom
 
+import scala.scalajs.js.annotation._
 import scala.scalajs.js
 import js.annotation._
 
@@ -223,12 +224,12 @@ class HtmlCanvasElement[F[_]] extends HtmlElement[F]
 @JSGlobal("HTMLDataListElement")
 @js.native
 class HtmlDataListElement[F[_]] extends HtmlElement[F]
-@JSGlobal("HTMLDListElement")
-@js.native
-class HtmlDListElement[F[_]] extends HtmlElement[F]
 @JSGlobal("HTMLDivElement")
 @js.native
 class HtmlDivElement[F[_]] extends HtmlElement[F]
+@JSGlobal("HTMLDListElement")
+@js.native
+class HtmlDListElement[F[_]] extends HtmlElement[F]
 @JSGlobal("HTMLEmbedElement")
 @js.native
 class HtmlEmbedElement[F[_]] extends HtmlElement[F]
