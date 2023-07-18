@@ -79,10 +79,14 @@ def configureTest(project: Project): Project =
         "org.typelevel" %%% "munit-cats-effect" % munitCEVersion,
         "org.typelevel" %%% "scalacheck-effect-munit" % scalaCheckEffectVersion
       ),
-      Compile / unmanagedSourceDirectories +=
-        (LocalRootProject / baseDirectory).value / "tests" / "src" / "main" / "scala",
-      Test / unmanagedSourceDirectories +=
-        (LocalRootProject / baseDirectory).value / "tests" / "src" / "test" / "scala",
+      Compile / unmanagedSourceDirectories += (LocalRootProject / baseDirectory).value / "tests" / "src" / "main" / "scala",
+      Test / unmanagedSourceDirectories ++=
+        Seq((LocalRootProject / baseDirectory).value / "tests" / "src" / "test" / "scala") ++
+        (if (scalaVersion.value.startsWith("3")) {
+          Seq((LocalRootProject / baseDirectory).value / "tests" / "src" / "test" / "scala-3")
+        } else {
+          Seq()
+        }),
       testOptions += Tests.Argument("+l")
     )
 
