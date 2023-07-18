@@ -23,11 +23,15 @@ class DomSuite extends CatsEffectSuite {
   val window = Window[IO]
 
   test("asInstanceOf") {
-    Document.ops(window.document).createElement("button").map {
-      case _: HtmlInputElement[IO] => false
-      case _: HtmlButtonElement[IO] => true
-      case _ => false
-    }.assert
+    Document
+      .ops(window.document)
+      .createElement("button")
+      .map {
+        case _: HtmlInputElement[IO]  => false
+        case _: HtmlButtonElement[IO] => true
+        case _                        => false
+      }
+      .assert
   }
 
 }
