@@ -214,7 +214,7 @@ object HtmlButtonElement {
   }
 }
 
-@JSGlobal("HTMLBrElement")
+@JSGlobal("HTMLBRElement")
 @js.native
 class HtmlBrElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLCanvasElement")
@@ -244,10 +244,10 @@ class HtmlHeadElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLHeadingElement")
 @js.native
 class HtmlHeadingElement[F[_]] protected () extends HtmlElement[F]
-@JSGlobal("HTMLHrElement")
+@JSGlobal("HTMLHRElement")
 @js.native
 class HtmlHrElement[F[_]] protected () extends HtmlElement[F]
-@JSGlobal("HTMLHTMLElement")
+@JSGlobal("HTMLHtmlElement")
 @js.native
 class HtmlHtmlElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLIFrameElement")
@@ -283,7 +283,7 @@ class HtmlLabelElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLLegendElement")
 @js.native
 class HtmlLegendElement[F[_]] protected () extends HtmlElement[F]
-@JSGlobal("HTMLLiElement")
+@JSGlobal("HTMLLIElement")
 @js.native
 class HtmlLiElement[F[_]] protected () extends HtmlElement[F]
 @JSGlobal("HTMLMapElement")
