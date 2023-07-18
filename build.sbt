@@ -82,11 +82,11 @@ def configureTest(project: Project): Project =
       Compile / unmanagedSourceDirectories += (LocalRootProject / baseDirectory).value / "tests" / "src" / "main" / "scala",
       Test / unmanagedSourceDirectories ++=
         Seq((LocalRootProject / baseDirectory).value / "tests" / "src" / "test" / "scala") ++
-        (if (scalaVersion.value.startsWith("3")) {
-          Seq((LocalRootProject / baseDirectory).value / "tests" / "src" / "test" / "scala-3")
-        } else {
-          Seq()
-        }),
+          (if (scalaVersion.value.startsWith("3")) {
+             Seq((LocalRootProject / baseDirectory).value / "tests" / "src" / "test" / "scala-3")
+           } else {
+             Seq()
+           }),
       testOptions += Tests.Argument("+l")
     )
 
