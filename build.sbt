@@ -80,13 +80,8 @@ def configureTest(project: Project): Project =
         "org.typelevel" %%% "scalacheck-effect-munit" % scalaCheckEffectVersion
       ),
       Compile / unmanagedSourceDirectories += (LocalRootProject / baseDirectory).value / "tests" / "src" / "main" / "scala",
-      Test / unmanagedSourceDirectories ++=
-        Seq((LocalRootProject / baseDirectory).value / "tests" / "src" / "test" / "scala") ++
-          (if (scalaVersion.value.startsWith("3")) {
-             Seq((LocalRootProject / baseDirectory).value / "tests" / "src" / "test" / "scala-3")
-           } else {
-             Seq()
-           }),
+      Test / unmanagedSourceDirectories +=
+        (LocalRootProject / baseDirectory).value / "tests" / "src" / "test" / "scala",
       testOptions += Tests.Argument("+l")
     )
 
@@ -94,8 +89,15 @@ def configureBrowserTest(project: Project): Project =
   project.settings(
     Compile / unmanagedSourceDirectories +=
       (LocalRootProject / baseDirectory).value / "testsBrowser" / "src" / "main" / "scala",
-    Test / unmanagedSourceDirectories +=
-      (LocalRootProject / baseDirectory).value / "testsBrowser" / "src" / "test" / "scala"
+    Test / unmanagedSourceDirectories ++=
+      Seq((LocalRootProject / baseDirectory).value / "testsBrowser" / "src" / "test" / "scala") ++
+        (if (scalaVersion.value.startsWith("3")) {
+           Seq(
+             (LocalRootProject / baseDirectory).value / "testsBrowser" / "src" / "test" / "scala-3"
+           )
+         } else {
+           Seq()
+         })
   )
 
 lazy val testsNodeJS = project
