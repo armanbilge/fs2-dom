@@ -16,13 +16,32 @@
 
 package fs2.dom
 
+import munit.Assertions
+import munit.FunSuite
+
 import scala.reflect.ClassTag
 import scala.scalajs.js
-import Assertions.*
 
-class GlobalSuite extends munit.FunSuite {
+class GlobalSuite extends FunSuite {
 
-  inline transparent def testGlobal[F[_[_]] <: js.Any](using C: ClassTag[F[Nothing]]) =
+  def assertGlobal[A <: js.Any](implicit loc: munit.Location, C: ClassTag[A]): Unit = {
+    val x: js.Any = 1
+    // this should get compiled to an instance check referencing the global object
+    try
+      x match {
+        case _: A =>
+          // If the check is erased, then we don't do an instance check
+          Assertions.fail("global is not bound correctly")
+        case _ => // success
+      }
+    catch {
+      case e: js.JavaScriptException if e.exception.isInstanceOf[js.ReferenceError] =>
+        // Global doesn't exist
+        Assertions.fail(s"could not find referenced global ${e}")
+    }
+  }
+
+  def testGlobal[F[_[_]] <: js.Any](implicit C: ClassTag[F[Nothing]]) =
     test(s"JSGlobal ${C.runtimeClass.getName}") {
       assertGlobal[F[Nothing]]
     }

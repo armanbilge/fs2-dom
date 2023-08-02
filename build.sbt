@@ -90,14 +90,7 @@ def configureBrowserTest(project: Project): Project =
     Compile / unmanagedSourceDirectories +=
       (LocalRootProject / baseDirectory).value / "testsBrowser" / "src" / "main" / "scala",
     Test / unmanagedSourceDirectories ++=
-      Seq((LocalRootProject / baseDirectory).value / "testsBrowser" / "src" / "test" / "scala") ++
-        (if (scalaVersion.value.startsWith("3")) {
-           Seq(
-             (LocalRootProject / baseDirectory).value / "testsBrowser" / "src" / "test" / "scala-3"
-           )
-         } else {
-           Seq()
-         })
+      Seq((LocalRootProject / baseDirectory).value / "testsBrowser" / "src" / "test" / "scala")
   )
 
 lazy val testsNodeJS = project
