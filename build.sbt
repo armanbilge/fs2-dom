@@ -79,7 +79,8 @@ def configureTest(project: Project): Project =
         "org.typelevel" %%% "munit-cats-effect" % munitCEVersion,
         "org.typelevel" %%% "scalacheck-effect-munit" % scalaCheckEffectVersion
       ),
-      Compile / unmanagedSourceDirectories += (LocalRootProject / baseDirectory).value / "tests" / "src" / "main" / "scala",
+      Compile / unmanagedSourceDirectories +=
+        (LocalRootProject / baseDirectory).value / "tests" / "src" / "main" / "scala",
       Test / unmanagedSourceDirectories +=
         (LocalRootProject / baseDirectory).value / "tests" / "src" / "test" / "scala",
       testOptions += Tests.Argument("+l")
@@ -89,8 +90,8 @@ def configureBrowserTest(project: Project): Project =
   project.settings(
     Compile / unmanagedSourceDirectories +=
       (LocalRootProject / baseDirectory).value / "testsBrowser" / "src" / "main" / "scala",
-    Test / unmanagedSourceDirectories ++=
-      Seq((LocalRootProject / baseDirectory).value / "testsBrowser" / "src" / "test" / "scala")
+    Test / unmanagedSourceDirectories +=
+      (LocalRootProject / baseDirectory).value / "testsBrowser" / "src" / "test" / "scala"
   )
 
 lazy val testsNodeJS = project
