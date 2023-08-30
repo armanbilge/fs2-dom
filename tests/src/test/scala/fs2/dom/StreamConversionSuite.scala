@@ -30,7 +30,7 @@ class StreamConversionSuite extends CatsEffectSuite with ScalaCheckEffectSuite {
     forAllF { (chunks: Vector[Vector[Byte]]) =>
       Stream
         .emits(chunks)
-        .map(Chunk.seq(_))
+        .map(Chunk.from(_))
         .unchunks
         .through(toReadableStream[IO])
         .flatMap(readable => readReadableStream(IO(readable)))
