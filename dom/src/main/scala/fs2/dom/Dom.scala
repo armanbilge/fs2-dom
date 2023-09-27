@@ -52,20 +52,14 @@ object Node {
     def parentNode(implicit F: Dom[F]): F[Option[Node[F]]] =
       F.delay(Option(fromJS(node.parentNode)))
 
-    def appendChild(child: Node[F])(implicit F: Dom[F]): F[Unit] = F.delay {
-      node.appendChild(child)
-      ()
-    }
+    def appendChild(child: Node[F])(implicit F: Dom[F]): F[Node[F]] =
+      F.delay(node.appendChild(child))
 
-    def removeChild(child: Node[F])(implicit F: Dom[F]): F[Unit] = F.delay {
-      node.removeChild(child)
-      ()
-    }
+    def removeChild(child: Node[F])(implicit F: Dom[F]): F[Node[F]] =
+      F.delay(node.removeChild(child))
 
-    def replaceChild(newChild: Node[F], oldChild: Node[F])(implicit F: Dom[F]): F[Unit] = F.delay {
-      node.replaceChild(newChild, oldChild)
-      ()
-    }
+    def replaceChild(newChild: Node[F], oldChild: Node[F])(implicit F: Dom[F]): F[Node[F]] =
+      F.delay(node.replaceChild(newChild, oldChild))
   }
 }
 
