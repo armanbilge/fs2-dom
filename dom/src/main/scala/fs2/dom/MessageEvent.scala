@@ -17,20 +17,38 @@
 package fs2.dom
 
 import cats.effect.kernel.Sync
+import cats.syntax.all._
 import org.scalajs.dom
 
-abstract class MessageEvent[F[_]] private[dom] extends Event[F] {}
+import scala.scalajs.js
 
-object MessageEvent {
-  def apply[F[_]](event: dom.MessageEvent)(implicit F: Sync[F]): MessageEvent[F] =
-    new WrappedMessageEvent(event)
+abstract class MessageEvent[F[_], A] private[dom] extends Event[F] {
+
+  def data: A
+
+  def origin: String
+
 }
 
-private final class WrappedMessageEvent[F[_]](val event: dom.MessageEvent)(implicit
-    val F: Sync[F]
-) extends MessageEventImpl[F]
+object MessageEvent {
+  def apply[F[_]](event: dom.MessageEvent)(implicit F: Sync[F]): MessageEvent[F, js.Any] =
+    new WrappedMessageEvent(event, event.data.asInstanceOf[js.Any])
 
-private trait MessageEventImpl[F[_]] extends MessageEvent[F] with EventImpl[F] {
+  private[dom] def deserialize[F[_], A](
+      event: dom.MessageEvent
+  )(implicit F: Sync[F], A: Serializer[A]): F[MessageEvent[F, A]] =
+    A.deserialize(event.data.asInstanceOf[js.Any]).liftTo[F].map(new WrappedMessageEvent(event, _))
+}
+
+private final class WrappedMessageEvent[F[_], A](
+    val event: dom.MessageEvent,
+    val data: A
+)(implicit val F: Sync[F])
+    extends MessageEventImpl[F, A]
+
+private trait MessageEventImpl[F[_], A] extends MessageEvent[F, A] with EventImpl[F] {
   def event: dom.MessageEvent
   implicit def F: Sync[F]
+
+  def origin = event.origin
 }
