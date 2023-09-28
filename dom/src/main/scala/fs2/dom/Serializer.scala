@@ -43,7 +43,7 @@ sealed abstract class Serializer[A] private { outer =>
 
 object Serializer {
 
-  def any: Serializer[js.Any] = new Serializer[js.Any] {
+  val any: Serializer[js.Any] = new Serializer[js.Any] {
     def serialize(a: js.Any) = a
     def deserialize(serialized: js.Any) = Right(serialized)
   }
