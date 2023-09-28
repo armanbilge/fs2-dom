@@ -16,37 +16,45 @@
 
 package fs2.dom
 
-import cats.syntax.all._
-
 import scala.scalajs.js
 
 /** @see [[https://developer.mozilla.org/en-US/docs/Glossary/Serializable_object]]
   *
-  * @todo So far the only instance of [[Serializer]] is for `Unit`.
+  * @todo So far the only implicit instance of [[Serializer]] is for `Unit`.
   * Track progress in [[https://github.com/armanbilge/fs2-dom/issues/59 fs2-dom#59]]).
   */
-sealed abstract class Serializer[A] private {
+sealed abstract class Serializer[A] private { outer =>
 
   def serialize(a: A): js.Any
 
   def deserialize(serialized: js.Any): Either[Throwable, A]
 
+  def imap[B](f: A => B)(g: B => A): Serializer[B] = new Serializer[B] {
+    def serialize(b: B) = outer.serialize(g(b))
+    def deserialize(serialized: js.Any) = outer.deserialize(serialized).map(f)
+  }
+
+  def iemap[B](f: A => Either[Throwable, B])(g: B => A): Serializer[B] = new Serializer[B] {
+    def serialize(b: B) = outer.serialize(g(b))
+    def deserialize(serialized: js.Any) = outer.deserialize(serialized).flatMap(f)
+  }
+
 }
 
 object Serializer {
 
-  implicit def unit: Serializer[Unit] = new Serializer[Unit] {
-    def serialize(u: Unit): js.Any = u
-    def deserialize(serialized: js.Any): Either[Throwable, Unit] = Either.unit
+  def any: Serializer[js.Any] = new Serializer[js.Any] {
+    def serialize(a: js.Any) = a
+    def deserialize(serialized: js.Any) = Right(serialized)
   }
 
-  // used in test
-  private[dom] implicit def int: Serializer[Int] = new Serializer[Int] {
-    def serialize(i: Int): js.Any = i
-    def deserialize(serialized: js.Any): Either[Throwable, Int] = (serialized: Any) match {
-      case i: Int => Right(i)
-      case x      => Left(new NumberFormatException(x.toString))
-    }
-  }
+  implicit def unit: Serializer[Unit] =
+    any.iemap { a =>
+      Either.cond(
+        js.isUndefined(a),
+        (),
+        new RuntimeException(s"$a is not undefined")
+      )
+    }(identity(_))
 
 }

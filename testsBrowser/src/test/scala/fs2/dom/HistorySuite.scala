@@ -27,6 +27,9 @@ class HistorySuite extends CatsEffectSuite {
 
   val history = Window[IO].history[Int]
 
+  implicit def intSerializer: Serializer[Int] =
+    Serializer.any.imap(_.asInstanceOf[Int])(identity(_))
+
   test("history") {
     Channel.unbounded[IO, Int].flatMap { ch =>
       history.state.discrete.unNone.through(ch.sendAll).compile.drain.background.surround {
