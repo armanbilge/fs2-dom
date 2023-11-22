@@ -75,7 +75,9 @@ private[dom] object StreamConverters {
     }
   }
 
-  def toReadableStream[F[_]](in: Stream[F, Byte])(implicit F: Async[F]): Resource[F, ReadableStream[Uint8Array]] = {
+  def toReadableStream[F[_]](
+      in: Stream[F, Byte]
+  )(implicit F: Async[F]): Resource[F, ReadableStream[Uint8Array]] = {
     final class Synchronizer[A] {
 
       type TakeCallback = Either[Throwable, A] => Unit
@@ -103,9 +105,7 @@ private[dom] object StreamConverters {
     }
 
     Resource.eval(F.delay(new Synchronizer[Option[Uint8Array]])).flatMap { synchronizer =>
-      val offers = in
-        .chunks
-        .noneTerminate
+      val offers = in.chunks.noneTerminate
         .foreach { chunk =>
           F.async[Either[Throwable, Option[Uint8Array]] => Unit] { cb =>
             F.delay(synchronizer.offer(cb)).as(Some(F.unit))
