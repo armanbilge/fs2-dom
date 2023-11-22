@@ -37,12 +37,12 @@ package object dom {
   ): Stream[F, Byte] = StreamConverters.readReadableStream(readableStream, cancelAfterUse)
 
   def toReadableStream[F[_]: Async]: Pipe[F, Byte, ReadableStream[Uint8Array]] =
-    StreamConverters.toReadableStream
+    in => Stream.resource(toReadableStreamResource(in))
 
   def toReadableStreamResource[F[_]: Async](
       stream: Stream[F, Byte]
   ): Resource[F, ReadableStream[Uint8Array]] =
-    stream.through(toReadableStream).compile.resource.lastOrError
+    StreamConverters.toReadableStream(stream)
 
   def events[F[_]: Async, E <: DomEvent](target: EventTarget, `type`: String): Stream[F, E] =
     EventTargetHelpers.listen(target, `type`)
