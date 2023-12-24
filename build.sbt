@@ -10,7 +10,7 @@ val scala213 = "2.13.12"
 ThisBuild / crossScalaVersions := Seq(scala213, "3.3.1")
 ThisBuild / scalaVersion := scala213
 
-ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
+ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("21"))
 
 ThisBuild / githubWorkflowBuildMatrixAdditions +=
   "project" -> List("rootChrome", "rootFirefox", "rootNodeJS")

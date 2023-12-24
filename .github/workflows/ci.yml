@@ -29,7 +29,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         scala: [2.13, 3]
-        java: [temurin@17]
+        java: [temurin@21]
         project: [rootChrome, rootFirefox, rootNodeJS]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
@@ -39,17 +39,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Java (temurin@17)
-        id: setup-java-temurin-17
-        if: matrix.java == 'temurin@17'
+      - name: Setup Java (temurin@21)
+        id: setup-java-temurin-21
+        if: matrix.java == 'temurin@21'
         uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
+        if: matrix.java == 'temurin@21' && steps.setup-java-temurin-21.outputs.cache-hit == 'false'
         run: sbt +update
 
       - name: Setup Node.js
@@ -62,18 +62,18 @@ jobs:
         run: sbt githubWorkflowCheck
 
       - name: Check headers and formatting
-        if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-latest' && matrix.project == 'rootChrome'
+        if: matrix.java == 'temurin@21' && matrix.os == 'ubuntu-latest' && matrix.project == 'rootChrome'
         run: sbt '++ ${{ matrix.scala }}' 'project ${{ matrix.project }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck
 
       - name: Test
         run: sbt '++ ${{ matrix.scala }}' 'project ${{ matrix.project }}' test
 
       - name: Check binary compatibility
-        if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-latest' && matrix.project == 'rootChrome'
+        if: matrix.java == 'temurin@21' && matrix.os == 'ubuntu-latest' && matrix.project == 'rootChrome'
         run: sbt '++ ${{ matrix.scala }}' 'project ${{ matrix.project }}' mimaReportBinaryIssues
 
       - name: Generate API documentation
-        if: matrix.java == 'temurin@17' && matrix.os == 'ubuntu-latest' && matrix.project == 'rootChrome'
+        if: matrix.java == 'temurin@21' && matrix.os == 'ubuntu-latest' && matrix.project == 'rootChrome'
         run: sbt '++ ${{ matrix.scala }}' 'project ${{ matrix.project }}' doc
 
       - name: Make target directories
@@ -98,7 +98,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        java: [temurin@17]
+        java: [temurin@21]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)
@@ -106,17 +106,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Java (temurin@17)
-        id: setup-java-temurin-17
-        if: matrix.java == 'temurin@17'
+      - name: Setup Java (temurin@21)
+        id: setup-java-temurin-21
+        if: matrix.java == 'temurin@21'
         uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
+        if: matrix.java == 'temurin@21' && steps.setup-java-temurin-21.outputs.cache-hit == 'false'
         run: sbt +update
 
       - name: Download target directories (2.13, rootChrome)
@@ -169,7 +169,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        java: [temurin@17]
+        java: [temurin@21]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)
@@ -177,17 +177,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Java (temurin@17)
-        id: setup-java-temurin-17
-        if: matrix.java == 'temurin@17'
+      - name: Setup Java (temurin@21)
+        id: setup-java-temurin-21
+        if: matrix.java == 'temurin@21'
         uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
           cache: sbt
 
       - name: sbt update
-        if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
+        if: matrix.java == 'temurin@21' && steps.setup-java-temurin-21.outputs.cache-hit == 'false'
         run: sbt +update
 
       - name: Submit Dependencies
