@@ -25,6 +25,8 @@ abstract class Navigator[F[_]] private {
 
   def locks: LockManager[F]
 
+  def onLine: F[Boolean]
+
 }
 
 object Navigator {
@@ -35,6 +37,8 @@ object Navigator {
       def clipboard = Clipboard(navigator.clipboard)
 
       def locks = LockManager(navigator.locks)
+
+      def onLine: F[Boolean] = F.pure(navigator.onLine)
 
     }
 
