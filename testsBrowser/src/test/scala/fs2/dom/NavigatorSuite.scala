@@ -25,6 +25,7 @@ class NavigatorSuite extends CatsEffectSuite {
 
   test("browser connectivity") {
     navigater.onLine.assertEquals(true)
+
   }
 
 }
