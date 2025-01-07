@@ -38,7 +38,7 @@ object Navigator {
 
       def locks = LockManager(navigator.locks)
 
-      def onLine: F[Boolean] = F.pure(navigator.onLine)
+      def onLine: F[Boolean] = F.delay(navigator.onLine)
 
     }
 
