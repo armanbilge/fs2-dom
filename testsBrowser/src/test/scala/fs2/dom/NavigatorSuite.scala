@@ -19,7 +19,6 @@ package fs2.dom
 import cats.effect.IO
 import munit.CatsEffectSuite
 
-
 class NavigatorSuite extends CatsEffectSuite {
   val navigater = Window[IO].navigator
 
