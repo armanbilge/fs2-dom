@@ -4,10 +4,9 @@ ThisBuild / organization := "com.armanbilge"
 ThisBuild / organizationName := "Arman Bilge"
 ThisBuild / developers += tlGitHubDev("armanbilge", "Arman Bilge")
 ThisBuild / startYear := Some(2022)
-ThisBuild / tlSonatypeUseLegacyHost := false
 
-val scala213 = "2.13.12"
-ThisBuild / crossScalaVersions := Seq(scala213, "3.3.1")
+val scala213 = "2.13.15"
+ThisBuild / crossScalaVersions := Seq(scala213, "3.3.4")
 ThisBuild / scalaVersion := scala213
 
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("21"))
@@ -18,16 +17,16 @@ ThisBuild / githubWorkflowBuildSbtStepPreamble += s"project $${{ matrix.project 
 
 ThisBuild / githubWorkflowBuildPreamble +=
   WorkflowStep.Use(
-    UseRef.Public("actions", "setup-node", "v3"),
+    UseRef.Public("actions", "setup-node", "v4"),
     name = Some("Setup Node.js"),
-    params = Map("node-version" -> "18"),
+    params = Map("node-version" -> "22"),
     cond = Some("matrix.project == 'rootNodeJS'")
   )
 
-val ceVersion = "3.5.2"
-val fs2Version = "3.9.3"
+val ceVersion = "3.5.7"
+val fs2Version = "3.11.0"
 val sjsDomVersion = "2.8.0"
-val munitCEVersion = "2.0.0-M4"
+val munitCEVersion = "2.0.0"
 val scalaCheckEffectVersion = "2.0.0-M2"
 
 lazy val root = project
