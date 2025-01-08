@@ -16,30 +16,16 @@
 
 package fs2.dom
 
-import cats.effect.kernel.Async
-import org.scalajs.dom
+import cats.effect.IO
+import munit.CatsEffectSuite
 
-abstract class Navigator[F[_]] private {
+class NavigatorSuite extends CatsEffectSuite {
 
-  def clipboard: Clipboard[F]
+  val navigater = Window[IO].navigator
 
-  def locks: LockManager[F]
+  test("browser connectivity") {
+    navigater.onLine.assertEquals(true)
 
-  def onLine: F[Boolean]
-
-}
-
-object Navigator {
-
-  private[dom] def apply[F[_]](navigator: dom.Navigator)(implicit F: Async[F]): Navigator[F] =
-    new Navigator[F] {
-
-      def clipboard = Clipboard(navigator.clipboard)
-
-      def locks = LockManager(navigator.locks)
-
-      def onLine: F[Boolean] = F.delay(navigator.onLine)
-
-    }
+  }
 
 }
