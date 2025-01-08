@@ -18,6 +18,7 @@ package fs2.dom
 
 import cats.effect.kernel.Async
 import org.scalajs.dom
+import scala.scalajs.js
 
 abstract class Navigator[F[_]] private {
 
@@ -26,6 +27,10 @@ abstract class Navigator[F[_]] private {
   def locks: LockManager[F]
 
   def onLine: F[Boolean]
+
+  def languages: F[js.Array[String]]
+
+  def language: F[String]
 
 }
 
@@ -39,6 +44,10 @@ object Navigator {
       def locks = LockManager(navigator.locks)
 
       def onLine: F[Boolean] = F.delay(navigator.onLine)
+
+      def languages: F[js.Array[String]] = F.delay(navigator.languages)
+
+      def language: F[String] = F.delay(navigator.language)
 
     }
 
