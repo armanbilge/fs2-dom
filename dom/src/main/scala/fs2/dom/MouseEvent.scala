@@ -19,7 +19,29 @@ package fs2.dom
 import cats.effect.kernel.Sync
 import org.scalajs.dom
 
-abstract class MouseEvent[F[_]] private[dom] extends UIEvent[F] {}
+abstract class MouseEvent[F[_]] private[dom] extends UIEvent[F] {
+  def button: Int
+
+  def buttons: Int
+
+  def clientX: Double
+
+  def clientY: Double
+
+  def getModifierState(keyArg: String): F[Boolean]
+
+  def movementX: Double
+
+  def movementY: Double
+
+  def pageX: Double
+
+  def pageY: Double
+
+  def screenX: Double
+
+  def screenY: Double
+}
 
 object MouseEvent {
   def apply[F[_]](event: dom.MouseEvent)(implicit F: Sync[F]): MouseEvent[F] =
@@ -32,4 +54,16 @@ private final class WrappedMouseEvent[F[_]](val event: dom.MouseEvent)(implicit 
 private trait MouseEventImpl[F[_]] extends MouseEvent[F] with UIEventImpl[F] {
   def event: dom.MouseEvent
   implicit def F: Sync[F]
+
+  def button = event.button
+  def buttons = event.buttons
+  def clientX = event.clientX
+  def clientY = event.clientY
+  def getModifierState(keyArg: String) = F.delay(event.getModifierState(keyArg))
+  def movementX = event.movementX
+  def movementY = event.movementY
+  def pageX = event.pageX
+  def pageY = event.pageY
+  def screenX = event.screenX
+  def screenY = event.screenY
 }
