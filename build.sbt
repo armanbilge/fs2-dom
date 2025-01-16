@@ -5,7 +5,7 @@ ThisBuild / organizationName := "Arman Bilge"
 ThisBuild / developers += tlGitHubDev("armanbilge", "Arman Bilge")
 ThisBuild / startYear := Some(2022)
 
-val scala213 = "2.13.15"
+val scala213 = "2.13.16"
 ThisBuild / crossScalaVersions := Seq(scala213, "3.3.4")
 ThisBuild / scalaVersion := scala213
 
