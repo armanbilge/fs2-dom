@@ -6,7 +6,7 @@ ThisBuild / developers += tlGitHubDev("armanbilge", "Arman Bilge")
 ThisBuild / startYear := Some(2022)
 
 val scala213 = "2.13.15"
-ThisBuild / crossScalaVersions := Seq(scala213, "3.3.4")
+ThisBuild / crossScalaVersions := Seq(scala213, "3.3.5")
 ThisBuild / scalaVersion := scala213
 
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("21"))
