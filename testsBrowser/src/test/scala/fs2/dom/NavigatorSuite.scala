@@ -28,4 +28,17 @@ class NavigatorSuite extends CatsEffectSuite {
 
   }
 
+  test("bowser language") {
+    navigater.language.assertEquals("en-US")
+  }
+
+  test("browser languages") {
+    for {
+      languages <- navigater.languages
+      _ <- IO {
+        assert(languages.contains("en-US"))
+      }
+    } yield ()
+  }
+
 }

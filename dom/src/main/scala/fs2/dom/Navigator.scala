@@ -27,6 +27,10 @@ abstract class Navigator[F[_]] private {
 
   def onLine: F[Boolean]
 
+  def languages: F[List[String]]
+
+  def language: F[String]
+
 }
 
 object Navigator {
@@ -39,6 +43,10 @@ object Navigator {
       def locks = LockManager(navigator.locks)
 
       def onLine: F[Boolean] = F.delay(navigator.onLine)
+
+      def languages: F[List[String]] = F.delay(navigator.languages.toList)
+
+      def language: F[String] = F.delay(navigator.language)
 
     }
 
