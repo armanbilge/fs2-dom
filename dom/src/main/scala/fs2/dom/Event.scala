@@ -68,6 +68,6 @@ private trait EventImpl[F[_]] extends Event[F] {
   def timeStamp = F.delay(event.timeStamp.millis)
   def `type` = event.`type`
   def preventDefault = F.delay(event.preventDefault())
-  def stopImmediatePropagation = F.delay(event.preventDefault())
+  def stopImmediatePropagation = F.delay(event.stopImmediatePropagation())
   def stopPropagation = F.delay(event.stopPropagation())
 }
